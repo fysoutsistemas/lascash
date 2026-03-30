@@ -39,6 +39,7 @@ clientHttp.interceptors.request.use(
     if (config.params.acao !== "logar"){
       if (isTokenValido()){        
         config.params.token = getToken();  
+        config.headers['Content-Type'] = 'text/plain;charset=utf-8';
       }
     }
 
