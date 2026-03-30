@@ -36,10 +36,11 @@ clientHttp.interceptors.request.use(
 
     showLoader();
 
+    config.headers['Content-Type'] = 'text/plain;charset=utf-8';
+
     if (config.params.acao !== "logar"){
       if (isTokenValido()){        
-        config.params.token = getToken();  
-        config.headers['Content-Type'] = 'text/plain;charset=utf-8';
+        config.params.token = getToken();          
       }
     }
 
