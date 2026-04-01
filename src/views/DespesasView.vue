@@ -287,6 +287,7 @@ import Lancamento from '@/dto/Lancamento';
 import Categoria from '@/dto/Categoria';
 import DateUtil from '@/util/DateUtil';
 import CurrencyUtil from '@/util/CurrencyUtil';
+import type FormularioAtualizado from '@/dto/FormularioAtualizado';
 
 const confirmacao = useConfirm();
 
@@ -353,33 +354,25 @@ const lancar = ({ valid }: any) => {
   if (valid){    
     
     let novoLancto = plainToInstance(Lancamento, lancto.value);
-    
-    lanctoClient.inserir(novoLancto).then(() => {
+
+    lanctoClient.inserir(novoLancto).then((formularioAtualizado: FormularioAtualizado) => {
       
-      lanctoClient.listarTodos().then((lancamentos: Lancamento[]) => {
-
-        lanctos.value = lancamentos;
-
-        lanctoClient.buscarResumoGeral().then(resumo => {
-
-          resumoGeral.value = resumo;
-
-          limparCampos();
+      lanctos.value = formularioAtualizado.lanctos;
+      
+      resumoGeral.value = formularioAtualizado.resumoGeral;
+      
+      limparCampos();
   
-          ativarReset();
-  
-          toast.add({
-            severity: 'success',
-            summary: 'Sucesso',
-            detail: 'Lançamento criado com sucesso',
-            life: 3000,
-          });
+      ativarReset();
 
-        });
-
+      toast.add({
+        severity: 'success',
+        summary: 'Sucesso',
+        detail: 'Lançamento criado com sucesso',
+        life: 3000,
       });
-            
-    });
+
+    });  
 
   }     
 

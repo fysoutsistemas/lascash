@@ -1,5 +1,6 @@
 import clientHttp from "@/composables/useAxios";
 import Categoria from "@/dto/Categoria";
+import FormularioAtualizado from "@/dto/FormularioAtualizado";
 import Lancamento from "@/dto/Lancamento";
 import ResumoGeral from "@/dto/ResumoGeral";
 import { plainToInstance } from "class-transformer";
@@ -44,8 +45,12 @@ export default class LanctoClient {
 
   }  
 
-  public async inserir(novoLancto: Lancamento): Promise<void>{
-    await clientHttp.post(this.URI, novoLancto, {'params': { 'acao': 'add-lancto'}});
+  public async inserir(novoLancto: Lancamento): Promise<FormularioAtualizado>{
+
+    let response = await clientHttp.post(this.URI, novoLancto, {'params': { 'acao': 'add-lancto'}});
+
+    return plainToInstance(FormularioAtualizado, response.data.content as FormularioAtualizado);
+
   }
 
   public async removerPor(id: string): Promise<void>{
