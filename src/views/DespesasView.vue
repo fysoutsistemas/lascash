@@ -313,10 +313,6 @@ const isValidarCampos = ref<boolean>(false);
 
 const isCategoriaInvalida = ref<boolean>(false);
 
-const anoSelecionado = ref(new Date().getFullYear());
-
-const mesSelecionado = ref(new Date().getMonth() + 1);
-
 const lanctoClient = new LanctoClient();
 
 const categoriaClient = new CategoriaClient();
