@@ -12,7 +12,8 @@ export default defineConfig({
       //Configuração do proxy em: 
       // https://medium.com/@tanitoluwaadenuga/if-youve-ever-fought-a-cors-error-read-this-eb4326c3fc17
       "/api": {
-        target: "https://script.google.com",
+        target: "http://localhost:9070",
+        //target: "https://larcash-api.onrender.com",
         changeOrigin: true,
         rewrite: (path) => path.replace(/^\/api/, ""),
       },

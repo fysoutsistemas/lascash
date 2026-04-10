@@ -84,7 +84,7 @@
 import { ref } from 'vue';
 import * as yup from 'yup';
 import { yupResolver } from '@primevue/forms/resolvers/yup';
-import Usuario from '@/dto/Usuario';
+import SolicitacaoDeToken from '@/dto/SolicitacaoDeToken';
 import LoginClient from '@/client/LoginClient';
 import { usePerfilStore } from '@/composables/usePerfilStore';
 import { useRouter } from 'vue-router';
@@ -97,7 +97,7 @@ const { registrarToken } = perfilStore;
 
 const loginClient = new LoginClient();
 
-const usuario = ref<Usuario>(new Usuario());
+const usuario = ref<SolicitacaoDeToken>(new SolicitacaoDeToken());
 
 const validatorResolver = ref(yupResolver(
   yup.object().shape({

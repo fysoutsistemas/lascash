@@ -68,6 +68,12 @@ export default class DateUtil {
     return `${year}-${month}-${day}`;
   }
 
+  static formatarDataBrParaAPI(data: string): string {
+    const [day, month, year] = data.split('/');
+    const dateConvertido = new Date(Date.UTC(Number(year), Number(month) - 1, Number(day)));
+    return dateConvertido.toISOString().split('T')[0]; 
+  }
+
   /**
    * Calcula e formata o tempo relativo desde uma data
    * @param data - Data a ser comparada (string ISO ou objeto Date)

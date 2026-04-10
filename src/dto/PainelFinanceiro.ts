@@ -2,18 +2,18 @@ import { Expose, Type } from "class-transformer";
 import Lancamento from "./Lancamento";
 import ResumoGeral from "./ResumoGeral";
 
-export default class FormularioAtualizado {
+export default class PainelFinanceiro {
 
   private _resumoGeral: ResumoGeral;
 
-  private _lanctos: Lancamento[];
+  private _lancamentos: Lancamento[];
 
   constructor(
     resumoGeral?: ResumoGeral,
-    lanctos?: Lancamento[]
+    lancamentos?: Lancamento[]
   ){
     this._resumoGeral = resumoGeral ?? new ResumoGeral();
-    this._lanctos = lanctos ?? [];
+    this._lancamentos = lancamentos ?? [];
   }
 
   @Expose({ name: 'resumoGeral' })
@@ -26,14 +26,14 @@ export default class FormularioAtualizado {
     this._resumoGeral = valor;
   }
 
-  @Expose({ name: 'lanctos' })
+  @Expose({ name: 'lancamentos' })
   @Type(() => Lancamento)
-  public get lanctos(): Lancamento[] {
-    return this._lanctos;
+  public get lancamentos(): Lancamento[] {
+    return this._lancamentos;
   }
 
-  public set lanctos(valor: Lancamento[]){
-    this._lanctos = valor;
+  public set lancamentos(valor: Lancamento[]){
+    this._lancamentos = valor;
   }
 
 }

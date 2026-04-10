@@ -1,15 +1,15 @@
 import clientHttp from "@/composables/useAxios";
-import type Usuario from "@/dto/Usuario";
+import type SolicitacaoDeToken from "@/dto/SolicitacaoDeToken";
 
 export default class LoginClient {
 
-  private URI: string = `${import.meta.env.VITE_URL_GOOGLE}`;
+  private URI: string = "/auth";
 
-  public async autenticar(usuario: Usuario): Promise<string> {
+  public async autenticar(solicitacao: SolicitacaoDeToken): Promise<string> {
   
-    const response = await clientHttp.post(this.URI, usuario, {'params': { 'acao': 'logar'}});
+    const response = await clientHttp.post(this.URI, solicitacao);
 
-    return response.data.content.token;
+    return response.data.token;
 
   }
 

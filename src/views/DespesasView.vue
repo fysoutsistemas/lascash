@@ -29,23 +29,23 @@
               </label>
               <Select
                 id="categoria" 
+                v-model="lancto.categoria"
                 :options="categs" 
-                optionLabel="descricao"
-                optionValue="descricao"
+                optionLabel="nome"
                 placeholder="Selecionar Categoria" 
-                name="categoria"
-                v-model="lancto.categoria"                
                 fluid
                 showClear
                 size="small"
+                :class="{ 'p-invalid': isValidarCampos && isCategoriaInvalida }"
+                @change="validarCategoria"
               />
               <Message
-                v-if="$form.categoria?.invalid"
+                v-if="isValidarCampos && isCategoriaInvalida"
                 severity="error"
                 size="small"
                 variant="simple"
               >
-                {{ $form.categoria?.error.message }}
+                A categoria é obrigatória
               </Message>
             </div>
 
@@ -131,23 +131,27 @@
           <div class="flex justify-between items-end">
             <div>
               <span class="text-xs text-slate-500 block mb-0.5">Gasto:</span>
-              <span class="text-lg font-bold text-slate-800">{{ CurrencyUtil.toBRL(resumoGeral.totalGasto) }}</span>
+              <span class="text-lg font-bold text-slate-800">
+                {{ CurrencyUtil.toBRL(painel.resumoGeral.totalGasto) }}
+              </span>
             </div>
             <div class="text-right">
               <span class="text-xs text-slate-500 block mb-0.5">Limite:</span>
-              <span class="text-sm font-semibold text-emerald-600">R$ {{ CurrencyUtil.toBRL(resumoGeral.totalOrcado) }}</span>
+              <span class="text-sm font-semibold text-emerald-600">
+                {{ CurrencyUtil.toBRL(painel.resumoGeral.totalOrcado) }}
+              </span>
             </div>
           </div>
           <Progressbar 
             :show-value="false" 
-            :value="resumoGeral.percentualGasto" 
+            :value="painel.resumoGeral.percentualGasto" 
             style="height: 12px; border-radius: 10px"
           >
           </Progressbar>
           <p class="text-[11px] text-slate-400 text-center">
             Você utilizou 
             <span class="font-bold text-slate-600">
-              {{ resumoGeral.percentualGasto }}%
+              {{ painel.resumoGeral.percentualGasto }}%
             </span> 
             do seu orçamento mensal.
           </p>
@@ -160,8 +164,8 @@
         </h2>
         <div class="grid grid-cols-3 gap-3">
           <div 
-            :key="resumo.categoria.descricao" 
-            v-for="resumo in resumoGeral.resumosPorCategoria"
+            :key="resumo.categoria.id" 
+            v-for="resumo in painel.resumoGeral.resumosPorCategoria"
             class="bg-white p-4 rounded-2xl border border-slate-100 
                    flex flex-col items-center text-center shadow-sm"             
           >
@@ -194,7 +198,7 @@
             </div>
 
             <span class="text-xs font-bold text-slate-800 truncate w-full mb-1">
-              {{ resumo.categoria.descricao }}
+              {{ resumo.categoria.nome }}
             </span>
 
             <div class="flex flex-col gap-0.5">
@@ -229,7 +233,7 @@
             Lançamentos
           </h2>
           <span class="text-base text-red-600 font-bold">
-            Total: {{ CurrencyUtil.toBRL(resumoGeral.totalGasto) }}
+            Total: {{ CurrencyUtil.toBRL(painel.resumoGeral.totalGasto) }}
           </span>
         </div>
 
@@ -237,19 +241,19 @@
           <div 
             :key="lancto.id" 
             class="p-4 flex justify-between items-center active:bg-slate-50 transition-colors" 
-            v-for="lancto in lanctos"
+            v-for="lancto in painel.lancamentos"
           >
             <div class="flex items-center gap-3">              
               <div
                 class="w-10 h-10 rounded-full flex items-center justify-center text-white"
                 :style="{
-                  'background-color': getCorDaCategoria(lancto)
+                  'background-color': getCorDaCategoria(lancto as Lancamento)
                 }"
               >
-                <i :class="getIconeDaCategoria(lancto)"></i>
+                <i :class="getIconeDaCategoria(lancto as Lancamento)"></i>
               </div>              
               <div>
-                <p class="font-medium text-sm text-slate-800">{{ lancto.categoria }}</p>
+                <p class="font-medium text-sm text-slate-800">{{ lancto.categoria.nome }}</p>
                 <p class="text-xs text-slate-400">{{ DateUtil.formatarData(lancto.data) }}</p>
               </div>
             </div>
@@ -263,7 +267,7 @@
               </button>
             </div>
           </div>
-          <div class="p-10 text-center text-slate-400" v-if="lanctos.length === 0">
+          <div class="p-10 text-center text-slate-400" v-if="painel.lancamentos.length === 0">
             <i class="pi pi-inbox text-3xl mb-2"></i>
             <p>Sem transações ainda</p>
           </div>
@@ -282,12 +286,13 @@ import { yupResolver } from '@primevue/forms/resolvers/yup';
 import { plainToInstance } from 'class-transformer';
 import { useConfirm, useToast } from 'primevue';
 import LanctoClient from '@/client/LanctoClient';
-import ResumoGeral from '@/dto/ResumoGeral';
 import Lancamento from '@/dto/Lancamento';
 import Categoria from '@/dto/Categoria';
 import DateUtil from '@/util/DateUtil';
 import CurrencyUtil from '@/util/CurrencyUtil';
-import type FormularioAtualizado from '@/dto/FormularioAtualizado';
+import PainelFinanceiro from '@/dto/PainelFinanceiro';
+import CategoriaClient from '@/client/CategoriaClient';
+import { unformat } from 'v-money3';
 
 const confirmacao = useConfirm();
 
@@ -304,22 +309,26 @@ const mascara = ref({
 
 const formKey = ref(0);
 
+const isValidarCampos = ref<boolean>(false);
+
+const isCategoriaInvalida = ref<boolean>(false);
+
+const anoSelecionado = ref(new Date().getFullYear());
+
+const mesSelecionado = ref(new Date().getMonth() + 1);
+
 const lanctoClient = new LanctoClient();
 
-const lanctos = ref<Lancamento[]>([]);
+const categoriaClient = new CategoriaClient();
 
 const categs = ref<Categoria[]>([]);
 
 const lancto = ref<Lancamento>(new Lancamento());
 
-const resumoGeral = ref<ResumoGeral>(new ResumoGeral());
+const painel = ref<PainelFinanceiro>(new PainelFinanceiro());
 
 const validatorResolver = ref(yupResolver(
   yup.object().shape({
-    categoria: yup
-      .string()
-      .trim()
-      .required("A categoria é obrigatória"),
     descricao: yup
       .string()
       .required("A descrição é obrigatória"),
@@ -331,54 +340,65 @@ const validatorResolver = ref(yupResolver(
 
 onMounted(() => {
   
-  listarCategs();
+  listarCategs();    
   
   lancto.value.data = DateUtil.formatarData(new Date());
-  
-  lanctoClient.listarTodos().then((lancamentos: Lancamento[]) => {
-    lanctos.value = lancamentos;
-  });
 
-  lanctoClient.buscarResumoGeral().then(resumo => {     
-    resumoGeral.value = resumo;
-  });  
+  lanctoClient.buscarUltimoPainel()
+    .then((painelEncontrado: PainelFinanceiro) => {
+      painel.value = painelEncontrado;
+    });    
 
 });
 
 const ativarReset = () => {
   formKey.value++;
+  isValidarCampos.value = false;
+}
+
+const validarCategoria = () => {
+  isCategoriaInvalida.value = lancto.value.categoria == null || lancto.value.categoria.id == 0;  
 }
 
 const lancar = ({ valid }: any) => {
 
-  if (valid){    
-    
-    let novoLancto = plainToInstance(Lancamento, lancto.value);
+  isValidarCampos.value = true;
 
-    lanctoClient.inserir(novoLancto).then((formularioAtualizado: FormularioAtualizado) => {
-      
-      lanctos.value = formularioAtualizado.lanctos;
-      
-      resumoGeral.value = formularioAtualizado.resumoGeral;
-      
-      limparCampos();
+  validarCategoria();
+
+  if (valid){        
+
+    if (!isCategoriaInvalida.value){      
+
+      lancto.value.valor = String(unformat(lancto.value.valor, mascara.value));
+
+      let novoLancto = plainToInstance(Lancamento, lancto.value);
   
-      ativarReset();
+      lanctoClient.inserir(novoLancto).then((painelResultante: PainelFinanceiro) => {
+        
+        painel.value = painelResultante;
+        
+        limparCampos();
+    
+        ativarReset();
+  
+        toast.add({
+          severity: 'success',
+          summary: 'Sucesso',
+          detail: 'Lançamento criado com sucesso',
+          life: 3000,
+        });
+  
+      });  
 
-      toast.add({
-        severity: 'success',
-        summary: 'Sucesso',
-        detail: 'Lançamento criado com sucesso',
-        life: 3000,
-      });
-
-    });  
+    }    
 
   }     
 
 }
 
 const remover = (lanctoSelecionado: Lancamento) => {
+  
   confirmacao.require({    
     message: 'Deseja realmente remover?',
     header: 'Confirmação',    
@@ -393,20 +413,21 @@ const remover = (lanctoSelecionado: Lancamento) => {
     },
     accept: () => {
       
-      lanctoClient.removerPor(lanctoSelecionado.id).then(() => {    
+      lanctoClient.removerPor(lanctoSelecionado.id).then(() => {
 
-        lanctoClient.listarTodos().then((lancamentos: Lancamento[]) => {
+        lanctoClient.buscarUltimoPainel()
+          .then((painelEncontrado: PainelFinanceiro) => {
 
-          lanctos.value = lancamentos;          
+            painel.value = painelEncontrado;
 
-          toast.add({
-            severity: 'success',
-            summary: 'Sucesso',
-            detail: 'Lançamento removido com sucesso',
-            life: 3000,
-          });          
+            toast.add({
+              severity: 'success',
+              summary: 'Sucesso',
+              detail: 'Lançamento removido com sucesso',
+              life: 3000,
+            });
 
-        });
+          });
         
       });
 
@@ -415,7 +436,7 @@ const remover = (lanctoSelecionado: Lancamento) => {
 }
 
 const listarCategs = () => {
-  lanctoClient.listarCategorias().then((categorias: Categoria[]) => {
+  categoriaClient.listarTodas().then((categorias: Categoria[]) => {
     categs.value = categorias;
   });
 }
@@ -426,12 +447,12 @@ const limparCampos = () => {
 }
 
 const getCorDaCategoria = (lanctoSelecionado: Lancamento): any => {
-  let categoria = categs.value.find(c => c.descricao == lanctoSelecionado.categoria);
+  let categoria = categs.value.find(c => c.nome == lanctoSelecionado.categoria.nome);
   return categoria?.cor;
 }
 
 const getIconeDaCategoria = (lanctoSelecionado: Lancamento) => {
-  let categoria = categs.value.find(c => c.descricao == lanctoSelecionado.categoria);
+  let categoria = categs.value.find(c => c.nome == lanctoSelecionado.categoria.nome);
   return 'fa-solid ' + categoria?.icone;
 }
 </script>

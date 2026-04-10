@@ -1,60 +1,33 @@
 import clientHttp from "@/composables/useAxios";
-import Categoria from "@/dto/Categoria";
-import FormularioAtualizado from "@/dto/FormularioAtualizado";
 import Lancamento from "@/dto/Lancamento";
-import ResumoGeral from "@/dto/ResumoGeral";
+import PainelFinanceiro from "@/dto/PainelFinanceiro";
+import DateUtil from "@/util/DateUtil";
 import { plainToInstance } from "class-transformer";
 
 export default class LanctoClient {
 
-  private URI: string = `${import.meta.env.VITE_URL_GOOGLE}`;  
+  private URI: string = "/lanctos";
 
-  public async buscarResumoGeral(): Promise<ResumoGeral> {
-
-    const response = await clientHttp.get(this.URI, {'params': { 'acao': 'buscar-resumo-geral'}});
-
-    return plainToInstance(ResumoGeral, response.data.content as ResumoGeral);
-
-  }
-
-  public async listarCategorias(): Promise<Categoria[]> {
-
-    const response = await clientHttp.get(this.URI, {'params': { 'acao': 'listar-categs'}});
-
-    let categorias: Categoria[] = [];
-
-    response.data.content.forEach((item: any) => {
-      categorias.push(plainToInstance(Categoria, item as Categoria));
-    });
-
-    return categorias;
-
-  }
-
-  public async listarTodos(): Promise<Lancamento[]> {
+  public async buscarUltimoPainel(): Promise<PainelFinanceiro> {
     
-    const response = await clientHttp.get(this.URI, {'params': { 'acao': 'listar-lanctos'}});
+    const response = await clientHttp.get(`${this.URI}/painel`);
 
-    let lanctos: Lancamento[] = [];
-
-    response.data.content.forEach((item: any) => {
-      lanctos.push(plainToInstance(Lancamento, item as Lancamento));
-    });
-
-    return lanctos;
-
-  }  
-
-  public async inserir(novoLancto: Lancamento): Promise<FormularioAtualizado>{
-
-    let response = await clientHttp.post(this.URI, novoLancto, {'params': { 'acao': 'add-lancto'}});
-
-    return plainToInstance(FormularioAtualizado, response.data.content as FormularioAtualizado);
+    return plainToInstance(PainelFinanceiro, response.data as PainelFinanceiro);
 
   }
 
-  public async removerPor(id: string): Promise<void>{
-    await clientHttp.post(this.URI, null, {'params': { 'acao': 'del-lancto', 'id': id}});
+  public async inserir(novoLancto: Lancamento): Promise<PainelFinanceiro>{
+
+    novoLancto.data = DateUtil.formatarDataBrParaAPI(novoLancto.data);
+    
+    await clientHttp.post(this.URI, novoLancto);
+
+    return this.buscarUltimoPainel();
+
+  }
+
+  public async removerPor(id: number): Promise<void>{
+    await clientHttp.delete(`${this.URI}/id/${id}`);
   }
 
 }

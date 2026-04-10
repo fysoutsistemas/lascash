@@ -2,10 +2,14 @@ import { usePerfilStore } from '@/composables/usePerfilStore';
 import axios, { type AxiosResponse, type InternalAxiosRequestConfig } from 'axios';
 import { ref } from 'vue';
 import { useToastService } from './useToastService';
+import { useRouter } from 'vue-router';
+import { instanceToPlain } from 'class-transformer';
 
 export const isLoading = ref(false);
 
 const perfilStore = usePerfilStore();
+
+const router = useRouter();
 
 const { isTokenValido, getToken } = perfilStore;
 
@@ -36,12 +40,22 @@ clientHttp.interceptors.request.use(
 
     showLoader();
 
-    config.headers['Content-Type'] = 'text/plain;charset=utf-8';
+    config.headers['Content-Type'] = "application/json";
+    
+    //Caso encontre um body, converter ele para json utilizando
+    //os decorators criados para os atributos
+    if (config.data && typeof config.data === 'object'){
+      config.data = instanceToPlain(config.data);    
+    }    
 
-    if (config.params.acao !== "logar"){
-      if (isTokenValido()){        
-        config.params.token = getToken();          
+    if  (config.url !== "/auth"){
+
+      if (isTokenValido()){
+        config.headers['Authorization'] = `Bearer ${getToken()}`;
+      }else{
+        router.push("/login");
       }
+
     }
 
     return config;
@@ -49,33 +63,21 @@ clientHttp.interceptors.request.use(
   },
   (error) => {
     hideLoader();
+
+    toast.add({
+      severity: 'error',
+      summary: 'Erro',
+      detail: error,
+      life: 3000,
+    });
+
     return Promise.reject(error);
   }
 );
 
 clientHttp.interceptors.response.use(
   (response: AxiosResponse) => {
-    
-    hideLoader();
-
-    let isErro = (response.data && response.data.status >= 400 && response.data.status <= 599) 
-      || (response.data >= 400 && response.status <= 599);
-
-    if (isErro){
-
-      let msgDeErro = response.data.content ? response.data.content : 'Erro código: ' + response.status;
-
-      toast.add({
-        severity: 'error',
-        summary: 'Erro',
-        detail: msgDeErro,
-        life: 3000,
-      });
-
-      return Promise.reject(msgDeErro);
-
-    }
-
+    hideLoader();    
     return response;
   },
   (error: unknown) => {
