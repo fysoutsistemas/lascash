@@ -1,3 +1,2 @@
-/api/* https://larcash-api.onrender.com/:splat 200
+/api/* https://larcash-api.onrender.com/:splat 200!
 /* /index.html 200
-/\* /index.html 404
