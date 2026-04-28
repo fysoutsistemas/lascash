@@ -16,17 +16,48 @@
 
       <Popover ref="userMenu">
         <div class="w-56">
-          <div class="p-2 border-b border-gray-200 min-w-0">
-            <div class="text-sm font-medium">{{ getLogin() }}</div>            
+          
+          <div class="flex flex-col mb-3">
+            <span class="text-on-surface font-bold text-base leading-tight truncate mb-1">
+              {{ getNomeCompleto() }}
+            </span>
+            <span class="text-on-surface-variant text-xs font-medium">
+              {{ getLogin() }}
+            </span>
           </div>
-          <div class="p-1">
+
+          <div 
+            class="flex items-center gap-2 px-3 py-2 bg-primary/5 
+                   rounded-xl border border-primary/10"
+          >
+            <span class="material-symbols-outlined text-primary text-sm">
+              family_restroom
+            </span>
+            <span class="text-primary text-[11px] font-bold uppercase tracking-wider truncate">
+              Família {{ getNomeDaFamilia() }}
+            </span>
+          </div>
+          
+          <div class="mt-5 border-t-1 border-gray-200">
+            <Button
+              icon="pi pi-cog"
+              label="Configurações da Conta"
+              severity="secondary"
+              text
+              size="small"
+              class="text-sm mt-3"
+              @click="redirectToConfig"
+            />
+          </div>
+
+          <div class="mt-1">
             <Button
               icon="pi pi-sign-out"
               label="Sair"
               severity="danger"
               text
               size="small"
-              class="w-full text-sm"
+              class="text-sm"
               @click="sair"
             />
           </div>
@@ -40,12 +71,22 @@
 import { usePerfilStore } from '@/composables/usePerfilStore';
 import { ref } from 'vue';
 import { useRouter } from 'vue-router';
+import { useNavigationStore } from '@/composables/useNavigationStore';
+
+const navigation = useNavigationStore();
 
 const router = useRouter();
 
 const perfilStore = usePerfilStore(); 
 
-const { getLogin, logout } = perfilStore;
+const { 
+  getLogin, 
+  getNomeCompleto,
+  getNomeDaFamilia,
+  logout 
+} = perfilStore;
+
+const { resetarNavegacao } = navigation;
 
 const userMenu = ref();
 
@@ -53,8 +94,40 @@ const toggleUserMenu = (event: Event) => {
   userMenu.value.toggle(event);  
 };
 
+const redirectToConfig = () => {
+  resetarNavegacao();
+  router.push("/config-conta");
+}
+
 const sair = () => {
   logout();
+  resetarNavegacao();
   router.push("/login");
 }
 </script>
+
+<style lang="css" scoped>
+.bg-surface {
+  background: #f7f9fb;
+}
+
+.text-on-surface {
+  color: #191c1e;
+}
+
+.text-on-surface-variant {
+  color: #3c4a42;
+}
+
+.text-outline {
+  color: #6c7a71;
+}
+
+.bg-surface-container-lowest {
+  background: #ffffff;
+}
+
+.bg-surface-container-low {
+  background: #f2f4f6;
+}
+</style>

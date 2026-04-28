@@ -2,14 +2,12 @@ import { usePerfilStore } from '@/composables/usePerfilStore';
 import axios, { type AxiosResponse, type InternalAxiosRequestConfig } from 'axios';
 import { ref } from 'vue';
 import { useToastService } from './useToastService';
-import { useRouter } from 'vue-router';
 import { instanceToPlain } from 'class-transformer';
+import router from "@/router";
 
 export const isLoading = ref(false);
 
 const perfilStore = usePerfilStore();
-
-const router = useRouter();
 
 const { isTokenValido, getToken } = perfilStore;
 
@@ -48,11 +46,11 @@ clientHttp.interceptors.request.use(
       config.data = instanceToPlain(config.data);    
     }    
 
-    if  (config.url !== "/auth"){
+    if  (config.url !== "/auth" && config.url !== "/contas-usuarios/registrar"){
 
       if (isTokenValido()){
         config.headers['Authorization'] = `Bearer ${getToken()}`;
-      }else{
+      }else{        
         router.push("/login");
       }
 
@@ -62,6 +60,7 @@ clientHttp.interceptors.request.use(
 
   },
   (error) => {
+
     hideLoader();
 
     toast.add({
@@ -72,28 +71,60 @@ clientHttp.interceptors.request.use(
     });
 
     return Promise.reject(error);
+
   }
 );
 
 clientHttp.interceptors.response.use(
+
   (response: AxiosResponse) => {
     hideLoader();    
     return response;
   },
-  (error: unknown) => {
+  (error) => {
 
     hideLoader();
 
-    toast.add({
-      severity: 'error',
-      summary: 'Erro',
-      detail: error,
-      life: 3000,
-    });
+    if (axios.isAxiosError(error)){
+
+      if (error.status === 401){
+        router.push("/login");
+      }else{
+
+        if (error.status === 400){
+
+          toast.add({
+            severity: 'error',
+            summary: 'Erro',
+            detail: error.response?.data.erros[0].mensagem,
+            life: 3000,
+          });
+  
+        }else{
+
+          toast.add({
+            severity: 'error',
+            summary: 'Erro',
+            detail: error.message,
+            life: 3000,
+          });
+        }
+  
+      }
+
+    }else{
+      toast.add({
+        severity: 'error',
+        summary: 'Erro',
+        detail: error,
+        life: 3000,
+      });
+    }
 
     return Promise.reject(error);
 
   }
+
 );
 
 export default clientHttp;

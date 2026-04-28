@@ -75,6 +75,18 @@
           />
         </Form>        
       </main>
+      <footer class="pb-12 px-8 text-center">
+        <p class="text-slate-600 text-sm">
+          Ainda não tem uma conta? 
+          <a 
+            @click="redirectToNovaConta()"
+            class="text-emerald-600 font-bold hover:text-emerald-700 
+                   transition-colors cursor-pointer"
+          >
+            Registre-se
+          </a>
+        </p>
+      </footer>
       <GlobalLoading />
     </div>
   </div>
@@ -88,14 +100,23 @@ import SolicitacaoDeToken from '@/dto/SolicitacaoDeToken';
 import LoginClient from '@/client/LoginClient';
 import { usePerfilStore } from '@/composables/usePerfilStore';
 import { useRouter } from 'vue-router';
+import { useNavigationStore } from '@/composables/useNavigationStore';
+import ContaDeUsuarioClient from '@/client/ContaDeUsuarioClient';
+import type ResumoDaContaDeUsuario from '@/dto/ResumoDaContaDeUsuario';
+
+const navigation = useNavigationStore();
 
 const perfilStore = usePerfilStore();
 
+const { registrarToken, atualizar } = perfilStore;
+
+const { resetarNavegacao } = navigation;
+
 const router = useRouter();
 
-const { registrarToken } = perfilStore;
-
 const loginClient = new LoginClient();
+
+const contaCliente = new ContaDeUsuarioClient();
 
 const usuario = ref<SolicitacaoDeToken>(new SolicitacaoDeToken());
 
@@ -115,14 +136,24 @@ const logar = async ({ valid }: any ) => {
   if (valid){
     
     loginClient.autenticar(usuario.value).then(
-      (tokenGerado: string) => {
+      (tokenGerado: string) => {        
         registrarToken(tokenGerado);
-        router.push("/");
+
+        contaCliente.buscarResumo().then((resumo: ResumoDaContaDeUsuario) => {
+          atualizar(resumo);
+          resetarNavegacao();
+          router.push("/");
+        })
+        
       }
     );
     
   }
 
+}
+
+const redirectToNovaConta = () => {
+  router.push("/nova-conta");
 }
 </script>
 

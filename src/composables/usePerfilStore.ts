@@ -1,3 +1,5 @@
+import type ResumoDaContaDeUsuario from "@/dto/ResumoDaContaDeUsuario";
+
 export const usePerfilStore = () => {
 
   const registrarToken = (token: string) => {
@@ -11,6 +13,8 @@ export const usePerfilStore = () => {
   const logout = () => {
     localStorage.removeItem("login");
     localStorage.removeItem("token");
+    localStorage.removeItem("nomeCompleto");
+    localStorage.removeItem("nomeDaFamilia");
   }
 
   const isTokenValido = (): boolean => {
@@ -32,15 +36,31 @@ export const usePerfilStore = () => {
   }
 
   const getLogin = (): string => {
-    return localStorage.getItem("login") ?? "Usuário";
+    return localStorage.getItem("login") ?? "Não Informado";
+  }
+
+  const getNomeCompleto = (): string => {
+    return localStorage.getItem("nomeCompleto") ?? "Não Informado";
+  }
+
+  const getNomeDaFamilia = (): string => {
+    return localStorage.getItem("nomeDaFamilia") ?? "Não Informada";
+  }
+
+  const atualizar = (resumoDaConta: ResumoDaContaDeUsuario) => {
+    localStorage.setItem("nomeCompleto", resumoDaConta.nomeCompleto);
+    localStorage.setItem("nomeDaFamilia", resumoDaConta.nomeDaFamilia);
   }
 
   return {
     registrarToken,
+    atualizar,
     logout,
     isTokenValido,
     getToken,
-    getLogin
+    getLogin,
+    getNomeCompleto,
+    getNomeDaFamilia
   }
 
 };

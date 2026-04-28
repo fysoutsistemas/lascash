@@ -1,6 +1,5 @@
 <template>
-  <div 
-    id="home"     
+  <div
     class="flex flex-col w-full max-w-md mx-auto bg-white shadow-xl min-h-screen"
   >
     <Header/>
@@ -280,11 +279,12 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, ref } from 'vue';
 import * as yup from 'yup';
+import { onMounted, ref } from 'vue';
 import { yupResolver } from '@primevue/forms/resolvers/yup';
 import { plainToInstance } from 'class-transformer';
 import { useConfirm, useToast } from 'primevue';
+import { unformat } from 'v-money3';
 import LanctoClient from '@/client/LanctoClient';
 import Lancamento from '@/dto/Lancamento';
 import Categoria from '@/dto/Categoria';
@@ -292,7 +292,6 @@ import DateUtil from '@/util/DateUtil';
 import CurrencyUtil from '@/util/CurrencyUtil';
 import PainelFinanceiro from '@/dto/PainelFinanceiro';
 import CategoriaClient from '@/client/CategoriaClient';
-import { unformat } from 'v-money3';
 
 const confirmacao = useConfirm();
 
@@ -429,6 +428,7 @@ const remover = (lanctoSelecionado: Lancamento) => {
 
     }
   });
+
 }
 
 const listarCategs = () => {

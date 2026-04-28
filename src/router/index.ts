@@ -1,10 +1,13 @@
 import { usePerfilStore } from '@/composables/usePerfilStore';
+import { createRouter, createWebHistory } from 'vue-router';
+import type { RouteLocationNormalized, RouteRecordRaw } from 'vue-router';
+import ConfigDeContaView from '@/views/ConfigDeContaView.vue';
 import DespesaView from '@/views/DespesasView.vue';
 import HomeView from '@/views/HomeView.vue';
 import LoginView from '@/views/LoginView.vue';
 import NotFoundView from '@/views/NotFoundView.vue';
-import { createRouter, createWebHistory } from 'vue-router';
-import type { RouteLocationNormalized, RouteRecordRaw } from 'vue-router';
+import NovaContaView from '@/views/NovaContaView.vue';
+import GerenciarOrcamentoView from '@/views/GerenciarOrcamentoView.vue';
 
 const perfilStore = usePerfilStore();
 
@@ -35,6 +38,30 @@ const routes: RouteRecordRaw[] = [
   },
 
   {
+    path: '/orcamento/:modo',    
+    name: 'orcamento',
+    component: GerenciarOrcamentoView,    
+    props: true,
+    meta: {
+      titulo: 'Orçamento',
+      authentication: {
+        required: true
+      }
+    }
+  },
+
+  {
+    path: '/config-conta',
+    component: ConfigDeContaView,
+    meta: {
+      titulo: 'Configuração da Conta',
+      authentication: {
+        required: true
+      }
+    }
+  },
+
+  {
     path: '/login',
     component: LoginView,
     meta: {
@@ -44,6 +71,17 @@ const routes: RouteRecordRaw[] = [
       }
     }
   },
+
+  {
+    path: '/nova-conta',
+    component: NovaContaView,
+    meta: {
+      titulo: 'Nova Conta',
+      authentication: {
+        required: false
+      }
+    }
+  },  
   
   {
     path: '/404',
@@ -75,13 +113,14 @@ const router = createRouter({
   routes
 });
 
-const ROTAS_PUBLICAS: string[] = [];
+const ROTAS_PUBLICAS: string[] = ['/login', '/nova-conta'];
 
 const isRotaEncontradaPara = (to: RouteLocationNormalized) => {
-  return to.matched.length > 0;
+  return to.matched.length > 0 && to.matched[0].name !== 'catch-all';
 };
 
 const isRotaPublica = (to: RouteLocationNormalized): boolean => {
+  
   const path = to.path.toLowerCase();
 
   const isPublicPath = ROTAS_PUBLICAS.some(route => {
@@ -89,26 +128,35 @@ const isRotaPublica = (to: RouteLocationNormalized): boolean => {
   });
 
   const hasPublicMeta = to.meta?.authentication?.required === false;
-  
+
   return isPublicPath || hasPublicMeta;
+
 };
 
 router.beforeEach(async (to, _from, next) => {
 
   try {
-    
+
     if (isRotaPublica(to)) {
-      return next();
-    }
 
-    if (isTokenValido()) {
-
-      if (!isRotaEncontradaPara(to)) {
-        return next({ name: 'not-found' });
+      const path = to.path.toLowerCase();
+      
+      if (path === '/nova-conta'){
+        if (isTokenValido()){
+          return next({ path: '/' });    
+        }
       }
 
-    } else {
-      return next({ path: '/login' });
+      return next();
+
+    }
+
+    if (isRotaEncontradaPara(to)){
+
+      if (!isTokenValido()) {
+        return next({ path: '/login' });
+      }  
+
     }
 
     return next();
@@ -116,6 +164,7 @@ router.beforeEach(async (to, _from, next) => {
   } catch(error) {
     return next({ path: '/login' });
   }
+
 });
 
 router.beforeEach((to) => {

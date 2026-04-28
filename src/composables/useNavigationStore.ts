@@ -24,7 +24,7 @@ export const useNavigationStore = defineStore('menu-selecionado', () => {
 
   const redirecionar = (itemSelecionado: ItemDeMenu) => {
 
-    items.value.forEach(item => {        
+    items.value.forEach(item => {
       
       if (item.label === itemSelecionado.label){
         item.isAtivo = true;
@@ -38,10 +38,18 @@ export const useNavigationStore = defineStore('menu-selecionado', () => {
 
   }
 
+  const resetarNavegacao = () => {
+    items.value.forEach(item => {
+      item.isAtivo = false;
+    });  
+    items.value[0].isAtivo = true;
+  }
+
   return { 
     items, 
     itemSelecionado, 
-    redirecionar 
+    redirecionar,
+    resetarNavegacao 
   }
 
 });

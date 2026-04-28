@@ -6,8 +6,8 @@ export default class Orcamento {
   private _familia: Familia;
 
   constructor(
-    public id: number = 0,
-    public limite: number = 0,
+    public id?: number,
+    public limite: string = "0,00",
     familia?: Familia,
     public status: string = "A"
   ){

@@ -48,7 +48,7 @@
       <div class="flex flex-col items-center gap-2 opacity-50">
         <div class="flex items-center gap-1">
           <span 
-            class="material-symbols-outlined text-primary text-xl" 
+            class="text-primary text-xl" 
             style="font-variation-settings: 'FILL' 1"
           >
             account_balance_wallet
@@ -62,11 +62,17 @@
 </template>
 
 <script setup lang="ts">
+import { useNavigationStore } from '@/composables/useNavigationStore';
 import { useRouter } from 'vue-router';
+
+const navigation = useNavigationStore();
 
 const router = useRouter();
 
+const { resetarNavegacao } = navigation;
+
 const redirecionarParaHome = () => {
+  resetarNavegacao();
   router.push("/");
 }
   
