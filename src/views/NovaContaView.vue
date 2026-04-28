@@ -21,7 +21,7 @@
         <h1 class="text-4xl font-extrabold text-on-surface tracking-tight mb-2">
            Crie sua conta
         </h1>
-        <p class="text-on-surface-variant font-medium">
+        <p class="text-on-surface-variant font-medium text-sm">
           Comece a cuidar do futuro da sua família hoje.
         </p>
       </div>

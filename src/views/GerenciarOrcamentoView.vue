@@ -65,7 +65,7 @@
             </span>
           </div>
           <h3 class="font-headline font-bold text-lg text-on-surface truncate">
-            Gerenciar Orçamento - {{ props.modo == 'inclusao' ? 'Inclusão' : 'Atualização'  }}
+            Gerenciar Orçamento
           </h3>
         </div>
         <div class="space-y-4">
