@@ -1,7 +1,7 @@
 <template>
   <header class="bg-white border-b border-slate-200 safe-area-top sticky top-0 z-50">
     <div class="px-5 py-4 flex justify-between items-center">
-      <div class="w-100">
+      <div class="w-200">
         <h1 class="text-xl font-bold text-emerald-600">LarCa$h</h1>
         <p class="text-xs text-slate-500">Gestor de Orçamento Familiar</p>
       </div>
@@ -14,7 +14,7 @@
         </span>
       </div>      
       <Avatar 
-        class="!bg-emerald-50" 
+        class="!bg-emerald-50 !w-40"
         size="large" 
         shape="circle"
         @click="toggleUserMenu"
