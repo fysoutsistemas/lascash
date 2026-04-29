@@ -7,6 +7,7 @@ export const usePerfilStore = () => {
       let login = atob(token).split(",")[0];
       localStorage.setItem("login", login);
       localStorage.setItem("token", token);
+      localStorage.setItem("isOcultarValores", "true");
     }
   }
 
@@ -52,6 +53,14 @@ export const usePerfilStore = () => {
     localStorage.setItem("nomeDaFamilia", resumoDaConta.nomeDaFamilia);
   }
 
+  const atualizarOcultarValores = (isOcultar: boolean) => {  
+    localStorage.setItem("isOcultarValores", String(isOcultar));
+  }
+
+  const getOcultarValores = (): boolean => {    
+    return localStorage.getItem("isOcultarValores") == 'true';
+  }
+
   return {
     registrarToken,
     atualizar,
@@ -60,7 +69,9 @@ export const usePerfilStore = () => {
     getToken,
     getLogin,
     getNomeCompleto,
-    getNomeDaFamilia
+    getNomeDaFamilia,
+    atualizarOcultarValores,
+    getOcultarValores
   }
 
 };

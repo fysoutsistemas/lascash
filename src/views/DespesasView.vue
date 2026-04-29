@@ -2,7 +2,9 @@
   <div
     class="flex flex-col w-full max-w-md mx-auto bg-white shadow-xl min-h-screen"
   >
-    <Header/>
+    <Header
+      @aoMudarVisibilidade="atualizarVisibilidade"
+    />
     <main class="flex-1 p-4 space-y-6 pb-20">
       <section class="bg-white rounded-2xl shadow-sm border border-slate-100 p-5">
         <h2 class="text-lg font-semibold mb-4 flex items-center gap-2">
@@ -131,13 +133,13 @@
             <div>
               <span class="text-xs text-slate-500 block mb-0.5">Gasto:</span>
               <span class="text-lg font-bold text-slate-800">
-                {{ CurrencyUtil.toBRL(painel.resumoGeral.totalGasto) }}
+                {{ isOcultar ? '********' : CurrencyUtil.toBRL(painel.resumoGeral.totalGasto) }}
               </span>
             </div>
             <div class="text-right">
               <span class="text-xs text-slate-500 block mb-0.5">Limite:</span>
               <span class="text-sm font-semibold text-emerald-600">
-                {{ CurrencyUtil.toBRL(painel.resumoGeral.totalOrcado) }}
+                {{ isOcultar ? '********' : CurrencyUtil.toBRL(painel.resumoGeral.totalOrcado) }}
               </span>
             </div>
           </div>
@@ -210,13 +212,13 @@
                     'text-red-700': resumo.gastos > resumo.categoria.limite 
                   }"
                 >
-                  {{ CurrencyUtil.toBRL(resumo.gastos) }}
+                  {{ isOcultar ? '*****' : CurrencyUtil.toBRL(resumo.gastos) }}
                 </span>
               </p>
               <p class="text-[10px] text-slate-400">
                 Limite: 
                 <span class="text-slate-700 font-medium">
-                  {{ CurrencyUtil.toBRL(resumo.categoria.limite) }}
+                  {{ isOcultar ? '*****' : CurrencyUtil.toBRL(resumo.categoria.limite) }}
                 </span>
               </p>
             </div>
@@ -232,7 +234,7 @@
             Lançamentos
           </h2>
           <span class="text-base text-red-600 font-bold">
-            Total: {{ CurrencyUtil.toBRL(painel.resumoGeral.totalGasto) }}
+            Total: {{ isOcultar ? '********' : CurrencyUtil.toBRL(painel.resumoGeral.totalGasto) }}
           </span>
         </div>
 
@@ -257,7 +259,9 @@
               </div>
             </div>
             <div class="flex items-center gap-4">
-              <span class="font-bold text-slate-700">{{ CurrencyUtil.toBRL(Number(lancto.valor)) }}</span>
+              <span class="font-bold text-slate-700">
+                {{ isOcultar ? '*****' : CurrencyUtil.toBRL(Number(lancto.valor)) }}
+              </span>
               <button 
                 class="p-2 text-slate-300 hover:text-red-500"
                 @click="remover(lancto as Lancamento)"
@@ -284,6 +288,7 @@ import { onMounted, ref } from 'vue';
 import { yupResolver } from '@primevue/forms/resolvers/yup';
 import { plainToInstance } from 'class-transformer';
 import { useConfirm, useToast } from 'primevue';
+import { usePerfilStore } from '@/composables/usePerfilStore';
 import { unformat } from 'v-money3';
 import LanctoClient from '@/client/LanctoClient';
 import Lancamento from '@/dto/Lancamento';
@@ -296,6 +301,10 @@ import CategoriaClient from '@/client/CategoriaClient';
 const confirmacao = useConfirm();
 
 const toast = useToast();
+
+const perfilStore = usePerfilStore();
+
+const { getOcultarValores } = perfilStore;
 
 const mascara = ref({
   decimal: ',',
@@ -322,6 +331,8 @@ const lancto = ref<Lancamento>(new Lancamento());
 
 const painel = ref<PainelFinanceiro>(new PainelFinanceiro());
 
+const isOcultar = ref<boolean>();  
+
 const validatorResolver = ref(yupResolver(
   yup.object().shape({
     descricao: yup
@@ -334,7 +345,9 @@ const validatorResolver = ref(yupResolver(
 ));
 
 onMounted(() => {
-  
+
+  isOcultar.value = getOcultarValores();
+
   listarCategs();    
   
   lancto.value.data = DateUtil.formatarData(new Date());
@@ -353,6 +366,10 @@ const ativarReset = () => {
 
 const validarCategoria = () => {
   isCategoriaInvalida.value = lancto.value.categoria == null || lancto.value.categoria.id == 0;  
+}
+
+const atualizarVisibilidade = (isOcultarValores: boolean) => {
+  isOcultar.value = isOcultarValores;
 }
 
 const lancar = ({ valid }: any) => {

@@ -168,14 +168,14 @@ const contaClient = new ContaDeUsuarioClient();
 
 const router = useRouter();
 
-const perfilStore = usePerfilStore();
-
 const toast = useToastService();
+
+const perfilStore = usePerfilStore();
 
 const {
   getNomeCompleto,
   getNomeDaFamilia,
-  atualizar 
+  atualizar
 } = perfilStore;  
 
 const formKey = ref(0);
@@ -209,7 +209,7 @@ const validatorResolver = ref(yupResolver(
   })
 ));
 
-onMounted(() => {
+onMounted(() => {  
   contaEditada.value.nomeCompleto = getNomeCompleto();  
   contaEditada.value.nomeDaFamilia = getNomeDaFamilia();
   formRef.value.reset();

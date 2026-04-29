@@ -4,6 +4,14 @@
       <div>
         <h1 class="text-xl font-bold text-emerald-600">LarCa$h</h1>
         <p class="text-xs text-slate-500">Gestor de Orçamento Familiar</p>
+      </div>
+      <div class="w-45 text-right hover:cursor-pointer">
+        <span 
+          @click="atualizarVisibilidade()"
+          class="symbol opacity-40 text-outline text-4xl mr-3"
+        >
+          {{ isOcultarValores ? 'visibility_off' : 'visibility' }}
+        </span>
       </div>      
       <Avatar 
         class="!bg-emerald-50" 
@@ -69,7 +77,7 @@
 
 <script setup lang="ts">
 import { usePerfilStore } from '@/composables/usePerfilStore';
-import { ref } from 'vue';
+import { onMounted, ref } from 'vue';
 import { useRouter } from 'vue-router';
 import { useNavigationStore } from '@/composables/useNavigationStore';
 
@@ -83,12 +91,30 @@ const {
   getLogin, 
   getNomeCompleto,
   getNomeDaFamilia,
-  logout 
+  logout,
+  atualizarOcultarValores,
+  getOcultarValores 
 } = perfilStore;
 
 const { resetarNavegacao } = navigation;
 
 const userMenu = ref();
+
+const isOcultarValores = ref<boolean>(true);
+
+const emit = defineEmits<{
+  aoMudarVisibilidade: [ isOcultarValores: boolean ]
+}>();
+
+onMounted(() => {
+  isOcultarValores.value = getOcultarValores();
+});
+
+const atualizarVisibilidade = () => {
+  isOcultarValores.value = !isOcultarValores.value;
+  atualizarOcultarValores(isOcultarValores.value);  
+  emit("aoMudarVisibilidade", isOcultarValores.value)
+}
 
 const toggleUserMenu = (event: Event) => {
   userMenu.value.toggle(event);  

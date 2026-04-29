@@ -3,7 +3,9 @@
     id="home" 
     class="flex flex-col w-full max-w-md mx-auto bg-white shadow-xl min-h-screen"
   >
-    <Header/>
+    <Header
+      @aoMudarVisibilidade="atualizarVisibilidade"
+    />
     <main class="flex-1 p-4 space-y-6 pb-20">
       <section class="bg-surface-container-low rounded-xl p-6">
         <div class="flex justify-between items-end mb-4">
@@ -15,9 +17,11 @@
               Você gastou {{ progresso.percentualGasto }}% do orçamento
             </p>
           </div>
-          <span class="text-2xl font-headline font-black text-primary">
-            {{ progresso.percentualGasto }}%
-          </span>
+          <div class="relative group">
+            <span class="text-2xl font-headline font-black text-primary">
+              {{ progresso.percentualGasto }}%
+            </span>
+          </div>
         </div>
         <Progressbar 
           :show-value="false" 
@@ -29,8 +33,12 @@
           class="flex justify-between mt-4 text-[10px] font-bold 
                  uppercase tracking-widest text-on-surface-variant"
         >
-          <span>Gasto: {{ CurrencyUtil.toBRL(progresso.totalGasto) }}</span>
-          <span>Restante: {{ CurrencyUtil.toBRL(progresso.totalRestante) }}</span>
+          <span>
+            Gasto: {{ isOcultar ? '********' : CurrencyUtil.toBRL(progresso.totalGasto) }}
+          </span>
+          <span>
+            Restante: {{ isOcultar ? '********' : CurrencyUtil.toBRL(progresso.totalRestante) }}
+          </span>
         </div>
       </section>
 
@@ -134,22 +142,39 @@
 <script setup lang="ts">
 import { onMounted, ref } from 'vue';
 import { useRouter } from 'vue-router';
+import { usePerfilStore } from '@/composables/usePerfilStore';
 import OrcamentoClient from '@/client/OrcamentoClient';
 import ProgressoDoOrcamento from '@/dto/ProgressoDoOrcamento';
 import CurrencyUtil from '@/util/CurrencyUtil';
 
+const orcamentoClient = new OrcamentoClient();
+
 const router = useRouter();
 
-const orcamentoClient = new OrcamentoClient();
+const perfilStore = usePerfilStore();
+
+const { getOcultarValores } = perfilStore;
 
 const progresso = ref<ProgressoDoOrcamento>(new ProgressoDoOrcamento());
 
+const isOcultar = ref<boolean>(true);
+
 onMounted(() => {
+
+  isOcultar.value = getOcultarValores();
+  
+  console.log('Home: ', getOcultarValores());
+
   orcamentoClient.buscarProgresso()
     .then((progressoEncontrado: ProgressoDoOrcamento) => {
       progresso.value = progressoEncontrado;
     });
+
 });
+
+const atualizarVisibilidade = (isOcultarValores: boolean) => {
+  isOcultar.value = isOcultarValores;
+}
 
 const toNovoOrcamento = () => {
   router.push({
