@@ -1,11 +1,11 @@
 <template>
   <header class="bg-white border-b border-slate-200 safe-area-top sticky top-0 z-50">
     <div class="px-5 py-4 flex justify-between items-center">
-      <div>
+      <div class="w-100">
         <h1 class="text-xl font-bold text-emerald-600">LarCa$h</h1>
         <p class="text-xs text-slate-500">Gestor de Orçamento Familiar</p>
       </div>
-      <div class="w-45 text-right hover:cursor-pointer">
+      <div class="w-full text-right hover:cursor-pointer">
         <span 
           @click="atualizarVisibilidade()"
           class="symbol opacity-40 text-outline text-4xl mr-3"
