@@ -18,7 +18,7 @@
       </div>
       <money3 
         v-if="tipo == 'monetario'"
-        v-bind="mascara"                 
+        v-bind="mascara"
         class="w-full bg-surface-container-low border-none rounded-xl pl-11 
                pr-4 py-3.5 text-on-surface placeholder:text-outline focus:ring-2 
                focus:ring-primary/20 transition-all outline-none" 

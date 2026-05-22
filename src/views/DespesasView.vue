@@ -39,7 +39,37 @@
                 size="small"
                 :class="{ 'p-invalid': isValidarCampos && isCategoriaInvalida }"
                 @change="validarCategoria"
-              />
+              >
+                <template #value="slotProps">                  
+                  <div v-if="slotProps.value && slotProps.value.id > 0" class="flex items-center">
+                    <div
+                      class="mr-3 w-6 h-6 rounded-full flex items-center justify-center text-white"
+                      :style="{
+                        'background-color': `${slotProps.value.cor}`
+                      }"
+                    >
+                      <i class="fa-solid" :class="slotProps.value.icone"></i>
+                    </div>
+                    <div>{{ slotProps.value.nome }}</div>
+                  </div>
+                  <span v-else>
+                    {{ slotProps.placeholder }}
+                  </span>
+                </template>
+                <template #option="slotProps">                  
+                  <div class="flex items-center">
+                    <div
+                      class="mr-3 w-6 h-6 rounded-full flex items-center justify-center text-white"
+                      :style="{
+                        'background-color': `${slotProps.option.cor}`
+                      }"
+                    >
+                      <i class="fa-solid" :class="slotProps.option.icone"></i>
+                    </div>
+                    <div>{{ slotProps.option.nome }}</div>
+                  </div>
+                </template>
+              </Select>
               <Message
                 v-if="isValidarCampos && isCategoriaInvalida"
                 severity="error"
@@ -75,6 +105,7 @@
             </div>
           
             <div class="grid grid-cols-2 gap-3">
+
               <div class="flex flex-col gap-1">
                 <label 
                   class="text-xs font-medium text-slate-500 ml-1"
@@ -97,7 +128,8 @@
                 >
                   {{ $form.data?.error.message }}
                 </Message>
-              </div>              
+              </div>
+
               <div class="flex flex-col gap-1">
                 <label class="text-xs font-medium text-slate-500 ml-1">Valor (R$)</label>                
                 <money3 
@@ -208,8 +240,8 @@
                 <span 
                   class="font-medium"
                   :class="{ 
-                    'text-emerald-700': resumo.gastos <= resumo.categoria.limite, 
-                    'text-red-700': resumo.gastos > resumo.categoria.limite 
+                    'text-emerald-700': resumo.gastos <= Number(resumo.categoria.limite), 
+                    'text-red-700': resumo.gastos > Number(resumo.categoria.limite) 
                   }"
                 >
                   {{ isOcultar ? '*****' : CurrencyUtil.toBRL(resumo.gastos) }}
@@ -218,7 +250,7 @@
               <p class="text-[10px] text-slate-400">
                 Limite: 
                 <span class="text-slate-700 font-medium">
-                  {{ isOcultar ? '*****' : CurrencyUtil.toBRL(resumo.categoria.limite) }}
+                  {{ isOcultar ? '*****' : CurrencyUtil.toBRL(Number(resumo.categoria.limite)) }}
                 </span>
               </p>
             </div>
@@ -252,7 +284,7 @@
                 }"
               >
                 <i :class="getIconeDaCategoria(lancto as Lancamento)"></i>
-              </div>              
+              </div>
               <div>
                 <p class="font-medium text-sm text-slate-800">{{ lancto.categoria.nome }}</p>
                 <p class="text-xs text-slate-400">{{ DateUtil.formatarData(lancto.data) }}</p>

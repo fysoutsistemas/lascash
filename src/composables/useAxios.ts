@@ -43,7 +43,7 @@ clientHttp.interceptors.request.use(
     //Caso encontre um body, converter ele para json utilizando
     //os decorators criados para os atributos
     if (config.data && typeof config.data === 'object'){
-      config.data = instanceToPlain(config.data);    
+      config.data = instanceToPlain(config.data);      
     }    
 
     if  (config.url !== "/auth" && config.url !== "/contas-usuarios/registrar"){

@@ -120,12 +120,17 @@ import OrcamentoClient from '@/client/OrcamentoClient';
 import CurrencyUtil from '@/util/CurrencyUtil';
 import { plainToInstance } from 'class-transformer';
 import { unformat } from 'v-money3';
+import { usePerfilStore } from '@/composables/usePerfilStore';
+
+const perfilStore = usePerfilStore();
 
 const confirmacao = useConfirm();
 
 const toast = useToast();
 
 const orcamentoClient = new OrcamentoClient();
+
+const { atualizarCategsConfigs } = perfilStore;
 
 const mascara = ref({
   decimal: ',',
@@ -180,11 +185,13 @@ const inserir = () => {
   let novoOrcamento = plainToInstance(Orcamento, orcamento.value);
   
   orcamentoClient.inserir(novoOrcamento).then(() => {
-
+    
+    atualizarCategsConfigs("N");
+    
     orcamentoClient.buscarProgresso()
-      .then((progressoEncontrado: ProgressoDoOrcamento) => {        
+      .then((progressoEncontrado: ProgressoDoOrcamento) => {
         progresso.value = progressoEncontrado;
-        orcamento.value = new Orcamento();
+        orcamento.value = new Orcamento();        
         showMsgDeSucesso("Novo orçamento criado!");
       });
     

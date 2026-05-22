@@ -8,10 +8,11 @@ import LoginView from '@/views/LoginView.vue';
 import NotFoundView from '@/views/NotFoundView.vue';
 import NovaContaView from '@/views/NovaContaView.vue';
 import GerenciarOrcamentoView from '@/views/GerenciarOrcamentoView.vue';
+import ConfigDeCategoriaView from '@/views/ConfigDeCategoriaView.vue';
 
 const perfilStore = usePerfilStore();
 
-const { isTokenValido } = perfilStore;
+const { isTokenValido, isCategsConfiguradas } = perfilStore;
 
 const routes: RouteRecordRaw[] = [
 
@@ -55,6 +56,17 @@ const routes: RouteRecordRaw[] = [
     component: ConfigDeContaView,
     meta: {
       titulo: 'Configuração da Conta',
+      authentication: {
+        required: true
+      }
+    }
+  },
+
+  {
+    path: '/config-categs',
+    component: ConfigDeCategoriaView,
+    meta: {
+      titulo: 'Configuração das Categorias',
       authentication: {
         required: true
       }
@@ -137,9 +149,9 @@ router.beforeEach(async (to, _from, next) => {
 
   try {
 
-    if (isRotaPublica(to)) {
+    const path = to.path.toLowerCase();
 
-      const path = to.path.toLowerCase();
+    if (isRotaPublica(to)) {      
       
       if (path === '/nova-conta'){
         if (isTokenValido()){
@@ -155,6 +167,12 @@ router.beforeEach(async (to, _from, next) => {
 
       if (!isTokenValido()) {
         return next({ path: '/login' });
+      }
+      
+      if (path === '/despesas'){
+        if (!isCategsConfiguradas()){
+          return next({ path: '/config-categs' });
+        }
       }  
 
     }

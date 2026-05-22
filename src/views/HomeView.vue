@@ -59,7 +59,7 @@
               add
             </span>
           </div>
-          <span class="font-label text-sm font-semibold text-on-surface">
+          <span class="text-[11px] font-bold text-slate-800 text-center leading-tight">
             Novo Orçamento
           </span>
         </Button>
@@ -79,8 +79,28 @@
               edit
             </span>
           </div>
-          <span class="font-label text-sm font-semibold text-on-surface">
+          <span class="text-[11px] font-bold text-slate-800 text-center leading-tight">
             Alterar Orçamento
+          </span>
+        </Button>
+        <Button
+          unstyled
+          class="flex-1 h-24 bg-surface-container-low rounded-2xl flex flex-col 
+                 items-center justify-center gap-2 hover:bg-surface-container 
+                 transition-colors active:scale-95 duration-200 group hover:cursor-pointer"
+          @click="toEditarLimites()"       
+        >
+          <div 
+            class="w-10 h-10 rounded-xl bg-[#10b981]/20 flex items-center 
+                   justify-center text-green-700 group-hover:bg-[#10b981] 
+                   group-hover:text-white transition-all"
+          >
+            <span class="material-symbols-outlined">
+              tune
+            </span>
+          </div>          
+          <span class="text-[11px] font-bold text-slate-800 text-center leading-tight">
+            Editar Limites
           </span>
         </Button>
       </section>
@@ -162,8 +182,6 @@ const isOcultar = ref<boolean>(true);
 onMounted(() => {
 
   isOcultar.value = getOcultarValores();
-  
-  console.log('Home: ', getOcultarValores());
 
   orcamentoClient.buscarProgresso()
     .then((progressoEncontrado: ProgressoDoOrcamento) => {
@@ -192,6 +210,10 @@ const toAtualizarOrcamento = () => {
       modo: 'atualizacao'
     }
   });
+}
+
+const toEditarLimites = () => {
+  router.push("/config-categs");
 }
 </script>
 

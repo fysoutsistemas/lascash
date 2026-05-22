@@ -4,7 +4,7 @@ export default class Categoria {
     public nome: string = "",
     public icone: string = "",
     public cor: string = "",
-    public limite: number = 0,
+    public limite: string = "0,00",
     public status: string = "A"
   ){}  
 }

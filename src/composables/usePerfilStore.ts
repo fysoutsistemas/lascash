@@ -51,6 +51,7 @@ export const usePerfilStore = () => {
   const atualizar = (resumoDaConta: ResumoDaContaDeUsuario) => {
     localStorage.setItem("nomeCompleto", resumoDaConta.nomeCompleto);
     localStorage.setItem("nomeDaFamilia", resumoDaConta.nomeDaFamilia);
+    localStorage.setItem("flCategsConfigs", resumoDaConta.flCategoriasConfiguradas);
   }
 
   const atualizarOcultarValores = (isOcultar: boolean) => {  
@@ -59,6 +60,14 @@ export const usePerfilStore = () => {
 
   const getOcultarValores = (): boolean => {    
     return localStorage.getItem("isOcultarValores") == 'true';
+  }
+
+  const atualizarCategsConfigs = (flag: string) => {
+    localStorage.setItem("flCategsConfigs", flag);
+  }
+
+  const isCategsConfiguradas = () : boolean => {
+    return localStorage.getItem("flCategsConfigs") == 'S';
   }
 
   return {
@@ -71,7 +80,9 @@ export const usePerfilStore = () => {
     getNomeCompleto,
     getNomeDaFamilia,
     atualizarOcultarValores,
-    getOcultarValores
+    getOcultarValores,
+    atualizarCategsConfigs,
+    isCategsConfiguradas
   }
 
 };
