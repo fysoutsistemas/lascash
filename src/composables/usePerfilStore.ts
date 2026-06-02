@@ -52,6 +52,7 @@ export const usePerfilStore = () => {
     localStorage.setItem("nomeCompleto", resumoDaConta.nomeCompleto);
     localStorage.setItem("nomeDaFamilia", resumoDaConta.nomeDaFamilia);
     localStorage.setItem("flCategsConfigs", resumoDaConta.flCategoriasConfiguradas);
+    localStorage.setItem("flChefeDaFamilia", resumoDaConta.flChefeDaFamilia);
   }
 
   const atualizarOcultarValores = (isOcultar: boolean) => {  
@@ -70,6 +71,10 @@ export const usePerfilStore = () => {
     return localStorage.getItem("flCategsConfigs") == 'S';
   }
 
+  const isChefeDeFamilia = () : boolean => {
+    return localStorage.getItem("flChefeDaFamilia") == 'S';
+  }
+
   return {
     registrarToken,
     atualizar,
@@ -82,7 +87,8 @@ export const usePerfilStore = () => {
     atualizarOcultarValores,
     getOcultarValores,
     atualizarCategsConfigs,
-    isCategsConfiguradas
+    isCategsConfiguradas,
+    isChefeDeFamilia
   }
 
 };

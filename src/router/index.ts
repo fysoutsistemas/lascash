@@ -9,6 +9,7 @@ import NotFoundView from '@/views/NotFoundView.vue';
 import NovaContaView from '@/views/NovaContaView.vue';
 import GerenciarOrcamentoView from '@/views/GerenciarOrcamentoView.vue';
 import ConfigDeCategoriaView from '@/views/ConfigDeCategoriaView.vue';
+import NovoMembroView from '@/views/NovoMembroView.vue';
 
 const perfilStore = usePerfilStore();
 
@@ -94,6 +95,18 @@ const routes: RouteRecordRaw[] = [
       }
     }
   },  
+
+  {
+    path: '/novo-membro/:token',
+    component: NovoMembroView,
+    props: true,
+    meta: {
+      titulo: 'Nova Membro',
+      authentication: {
+        required: false
+      }
+    }
+  },
   
   {
     path: '/404',

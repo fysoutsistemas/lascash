@@ -86,7 +86,7 @@ clientHttp.interceptors.response.use(
     hideLoader();
 
     if (axios.isAxiosError(error)){
-
+      console.log(error.status);
       if (error.status === 401){
         router.push("/login");
       }else{

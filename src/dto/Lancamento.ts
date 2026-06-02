@@ -10,7 +10,8 @@ export default class Lancamento {
     public descricao: string = "",
     public data: string = "",
     public valor: string = "0,00",
-    categoria?: Categoria
+    categoria?: Categoria,
+    public loginDoCriador: string = ""
   ){
     this._categoria = categoria ?? new Categoria();
   }

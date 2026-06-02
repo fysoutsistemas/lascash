@@ -295,11 +295,13 @@
                 {{ isOcultar ? '*****' : CurrencyUtil.toBRL(Number(lancto.valor)) }}
               </span>
               <button 
+                v-if="getLogin() == lancto.loginDoCriador"
                 class="p-2 text-slate-300 hover:text-red-500"
                 @click="remover(lancto as Lancamento)"
               >
                 <i class="pi pi-trash"></i>
               </button>
+              <div v-else class="w-8"></div>
             </div>
           </div>
           <div class="p-10 text-center text-slate-400" v-if="painel.lancamentos.length === 0">
@@ -336,7 +338,7 @@ const toast = useToast();
 
 const perfilStore = usePerfilStore();
 
-const { getOcultarValores } = perfilStore;
+const { getOcultarValores, getLogin } = perfilStore;
 
 const mascara = ref({
   decimal: ',',
