@@ -17,7 +17,7 @@ export const useNavigationStore = defineStore('menu-selecionado', () => {
     { icone: 'pi-home', label: 'INÍCIO',  rota: '/', isAtivo: false },
     { icone: 'pi-shopping-cart', label: 'COMPRAS',  rota: '/', isAtivo: false },
     { icone: 'pi-receipt', label: 'DESPESAS',  rota: '/despesas', isAtivo: false },
-    { icone: 'pi-heart', label: 'MATERNIDADE',  rota: '/', isAtivo: false }
+    { icone: 'pi-chart-bar', label: 'INDICADORES',  rota: '/', isAtivo: false }
   ]);
 
   const itemSelecionado = ref<ItemDeMenu>(items.value[0]);
