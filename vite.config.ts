@@ -1,18 +1,21 @@
-import { defineConfig } from 'vite'
-import vue from '@vitejs/plugin-vue'
-import tailwindcss from '@tailwindcss/vite'
-import { resolve } from 'path'
+import { defineConfig } from 'vite';
+import vue from '@vitejs/plugin-vue';
+import tailwindcss from '@tailwindcss/vite';
+import { resolve } from 'path';
 import Components from 'unplugin-vue-components/vite';
 import { PrimeVueResolver } from '@primevue/auto-import-resolver';
+import { VitePWA } from 'vite-plugin-pwa';
 
 export default defineConfig({
   server: {
-    allowedHosts: ['larcash', '.com.br'],
+    //allowedHosts: ['larcash', '.com.br'],
+    allowedHosts: ['a937-189-112-150-157', '.ngrok-free.app'],
     proxy: {
       //Configuração do proxy em: 
       // https://medium.com/@tanitoluwaadenuga/if-youve-ever-fought-a-cors-error-read-this-eb4326c3fc17
       "/api": {
-        target: "http://localhost:9070",
+        target: "https://570d-189-112-150-157.ngrok-free.app",
+        //target: "http://localhost:9070",
         //target: "https://larcash-api.onrender.com",
         changeOrigin: true,
         rewrite: (path) => path.replace(/^\/api/, ""),
@@ -21,6 +24,20 @@ export default defineConfig({
   },
   plugins: [
     vue(),
+    VitePWA({ 
+      registerType: 'autoUpdate',      
+      devOptions: {
+        enabled: true
+      },
+      includeAssets: [
+        "**/*"
+      ],
+      workbox: {
+        globPatterns: [
+          "**/*.{js,css,html,png}"
+        ]
+      }
+    }),
     tailwindcss(),
     //Documentação em: https://www.npmjs.com/package/unplugin-vue-components
     Components({

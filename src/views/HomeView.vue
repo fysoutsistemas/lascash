@@ -215,6 +215,36 @@
             />
           </div>
         </Dialog>
+      </section>
+      
+      <!-- Painel de instalação PWA -->
+      <section 
+        class="relative overflow-hidden bg-primary-container rounded-2xl p-6 text-white shadow-xl"
+      >
+        <div class="relative z-10">
+          <div class="flex items-center gap-3 mb-3">
+            <div class="bg-white/20 p-2 rounded-lg backdrop-blur-md">
+              <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">
+                install_mobile
+              </span>
+            </div>
+            <h3 class="font-bold text-lg leading-tight">Tenha o LarCa$h sempre à mão</h3>
+          </div>
+          <p class="text-white/80 text-sm mb-6 leading-relaxed">
+            Instale nosso aplicativo para ter acesso instantâneo às suas finanças, mesmo offline, e receba notificações em tempo real.
+          </p>
+          <Button 
+            unstyled
+            class="w-full bg-white text-primary font-bold py-4 rounded-full flex items-center 
+                   justify-center gap-2 shadow-lg active:scale-95 transition-transform"
+            @click="installPWA"
+          >
+            <span>Instalar Aplicativo</span>
+            <span class="material-symbols-outlined text-sm">arrow_forward</span>
+          </Button>
+        </div>
+        <!-- Decorative circle -->
+        <div class="absolute -right-10 -bottom-10 w-40 h-40 bg-white/10 rounded-full blur-3xl"></div>
       </section>      
     </main>
     <MenuInferior/>
@@ -250,7 +280,9 @@ const isOcultar = ref<boolean>(true);
 
 const isShowLink = ref<boolean>(false);
 
-const linkDoNovoMembro = ref<string>("")
+const linkDoNovoMembro = ref<string>("");
+
+const deferredPrompt = ref<any>(null);
 
 onMounted(() => {
 
@@ -260,6 +292,14 @@ onMounted(() => {
     .then((progressoEncontrado: ProgressoDoOrcamento) => {
       progresso.value = progressoEncontrado;
     });
+  
+  //Configuração do evento de pré instalação de PWA
+  window.addEventListener('beforeinstallprompt', (e) => {
+    // Prevent the default browser mini-infobar from appearing
+    e.preventDefault()
+    // Stash the event so it can be triggered later
+    deferredPrompt.value = e
+  });
 
 });
 
@@ -285,6 +325,19 @@ const copyLink = async () => {
     life: 3000,
   });
 
+}
+
+const installPWA = async () => {
+  if (deferredPrompt.value) {
+    // Show the native install prompt
+    deferredPrompt.value.prompt()
+    // Wait for the user to respond to the prompt
+    const { outcome } = await deferredPrompt.value.userChoice
+    if (outcome === 'accepted') {
+      console.log('User accepted the PWA install')
+    }
+    deferredPrompt.value = null
+  }
 }
 
 const toNovoOrcamento = () => {
