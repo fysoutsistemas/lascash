@@ -4,6 +4,7 @@ export default class NovoMembro {
     public senha: string = "",
     public confirmacao: string = "",
     public nomeCompleto: string = "",
-    public tokenDoConvite: string = ""
+    public tokenDoConvite: string = "",
+    public telefone: string = ""
   ){}
 }

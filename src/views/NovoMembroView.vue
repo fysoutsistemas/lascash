@@ -78,6 +78,19 @@
             :msgDeErro="$form.nomeCompleto?.error?.message"
           />
 
+          <!-- telefone -->
+          <FormRegisterField
+            id="telefone"
+            nameValidation="telefone"
+            label="TELEFONE"
+            estilos="mb-5"
+            tipo="telefone"
+            icone="mobile_2"            
+            v-model:modelValue="membro.telefone"
+            :isInvalido="$form.telefone?.invalid"
+            :msgDeErro="$form.telefone?.error?.message"
+          />
+
           <!-- Senha -->
           <FormRegisterField
             id="senha"
@@ -227,7 +240,11 @@ const validatorResolver = ref(yupResolver(
     confirmacao: yup
       .string()
       .oneOf([yup.ref('senha'), undefined], 'As senhas devem ser iguais')
-      .required("A confirmação de senha é obrigatória"),  
+      .required("A confirmação de senha é obrigatória"),
+    telefone: yup
+      .string()
+      .required("O telefone é obrigatório.")
+      .matches(/^\+55 \(\d{2}\) 9\d{4}-\d{4}$/, "Formato de telefone inválido.")    
   })
 ));
 

@@ -219,6 +219,7 @@
       
       <!-- Painel de instalação PWA -->
       <section 
+        v-if="canInstall && !isInstalled"
         class="relative overflow-hidden bg-primary-container rounded-2xl p-6 text-white shadow-xl"
       >
         <div class="relative z-10">
@@ -237,7 +238,7 @@
             unstyled
             class="w-full bg-white text-primary font-bold py-4 rounded-full flex items-center 
                    justify-center gap-2 shadow-lg active:scale-95 transition-transform"
-            @click="installPWA"
+            @click="promptInstall"       
           >
             <span>Instalar Aplicativo</span>
             <span class="material-symbols-outlined text-sm">arrow_forward</span>
@@ -257,6 +258,8 @@ import { onMounted, ref } from 'vue';
 import { useRouter } from 'vue-router';
 import { usePerfilStore } from '@/composables/usePerfilStore';
 import { useToast } from 'primevue';
+import { usePwaUpdate } from '@/composables/usePwaUpdate';
+import { usePwaInstall } from '@/composables/usePwaInstall';
 import OrcamentoClient from '@/client/OrcamentoClient';
 import ProgressoDoOrcamento from '@/dto/ProgressoDoOrcamento';
 import CurrencyUtil from '@/util/CurrencyUtil';
@@ -266,11 +269,20 @@ const orcamentoClient = new OrcamentoClient();
 
 const conviteClient = new ConviteClient();
 
+const { 
+  canInstall, 
+  isInstalled, 
+  promptInstall 
+} = usePwaInstall()
+
 const toast = useToast();
 
 const router = useRouter();
 
 const perfilStore = usePerfilStore();
+
+//Dispara o registro do service worker do PWA
+usePwaUpdate();
 
 const { getOcultarValores, isChefeDeFamilia } = perfilStore;
 
@@ -282,24 +294,14 @@ const isShowLink = ref<boolean>(false);
 
 const linkDoNovoMembro = ref<string>("");
 
-const deferredPrompt = ref<any>(null);
-
-onMounted(() => {
+onMounted(() => {  
 
   isOcultar.value = getOcultarValores();
 
   orcamentoClient.buscarProgresso()
     .then((progressoEncontrado: ProgressoDoOrcamento) => {
       progresso.value = progressoEncontrado;
-    });
-  
-  //Configuração do evento de pré instalação de PWA
-  window.addEventListener('beforeinstallprompt', (e) => {
-    // Prevent the default browser mini-infobar from appearing
-    e.preventDefault()
-    // Stash the event so it can be triggered later
-    deferredPrompt.value = e
-  });
+    });    
 
 });
 
@@ -315,7 +317,7 @@ const showLinkDialog = () => {
 }
 
 const copyLink = async () => {
-  
+  console.log(navigator);
   await navigator.clipboard.writeText(linkDoNovoMembro.value);
 
   toast.add({
@@ -325,19 +327,6 @@ const copyLink = async () => {
     life: 3000,
   });
 
-}
-
-const installPWA = async () => {
-  if (deferredPrompt.value) {
-    // Show the native install prompt
-    deferredPrompt.value.prompt()
-    // Wait for the user to respond to the prompt
-    const { outcome } = await deferredPrompt.value.userChoice
-    if (outcome === 'accepted') {
-      console.log('User accepted the PWA install')
-    }
-    deferredPrompt.value = null
-  }
 }
 
 const toNovoOrcamento = () => {

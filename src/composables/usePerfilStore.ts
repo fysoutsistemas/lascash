@@ -48,11 +48,16 @@ export const usePerfilStore = () => {
     return localStorage.getItem("nomeDaFamilia") ?? "Não Informada";
   }
 
+  const getFotoDoUsuario = (): string => {
+    return localStorage.getItem("fotoDoUsuario") ?? "";
+  }
+
   const atualizar = (resumoDaConta: ResumoDaContaDeUsuario) => {
     localStorage.setItem("nomeCompleto", resumoDaConta.nomeCompleto);
     localStorage.setItem("nomeDaFamilia", resumoDaConta.nomeDaFamilia);
     localStorage.setItem("flCategsConfigs", resumoDaConta.flCategoriasConfiguradas);
     localStorage.setItem("flChefeDaFamilia", resumoDaConta.flChefeDaFamilia);
+    localStorage.setItem("fotoDoUsuario", resumoDaConta.foto);
   }
 
   const atualizarOcultarValores = (isOcultar: boolean) => {  
@@ -84,6 +89,7 @@ export const usePerfilStore = () => {
     getLogin,
     getNomeCompleto,
     getNomeDaFamilia,
+    getFotoDoUsuario,
     atualizarOcultarValores,
     getOcultarValores,
     atualizarCategsConfigs,

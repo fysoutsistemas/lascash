@@ -412,9 +412,9 @@ const lancar = ({ valid }: any) => {
 
   validarCategoria();
 
-  if (valid){        
+  if (valid){
 
-    if (!isCategoriaInvalida.value){      
+    if (!isCategoriaInvalida.value){
 
       lancto.value.valor = String(unformat(lancto.value.valor, mascara.value));
 

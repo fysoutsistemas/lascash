@@ -98,7 +98,7 @@ const router = useRouter();
 
 const toast = useToast();
 
-const { atualizarCategsConfigs } = perfilStore;
+const { atualizarCategsConfigs, isCategsConfiguradas } = perfilStore;
 
 const mascara = ref({
   decimal: ',',
@@ -153,6 +153,8 @@ const salvar = () => {
 
       categs.value = categsAtualizadas;
 
+      let isRedirecionar = !isCategsConfiguradas();
+
       atualizarCategsConfigs("S");
       
       toast.add({
@@ -161,6 +163,10 @@ const salvar = () => {
         detail: 'Limites atualizados com sucesso',
         life: 3000,
       });
+
+      if (isRedirecionar){
+        router.push("/despesas");      
+      }
 
     });
 

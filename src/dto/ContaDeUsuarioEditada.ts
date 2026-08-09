@@ -4,6 +4,7 @@ export default class ContaDeUsuarioEditada {
     public nomeDaFamilia: string = "",
     public senhaAtual: string = "",
     public novaSenha: string = "",
-    public confirmacao: string = ""
+    public confirmacao: string = "",
+    public foto: string = ""
   ){}
 }

@@ -30,12 +30,23 @@
       </money3>
       <InputText
         unstyled
-        v-if="tipo != 'monetario'"
+        v-if="tipo != 'monetario' && tipo != 'telefone'"
         class="w-full bg-surface-container-low border-none rounded-xl 
                px-4 py-3.5 text-on-surface placeholder:text-outline 
                focus:ring-2 focus:ring-primary/20 transition-all outline-none" 
         :placeholder="placeholder" 
         :type="tipo"
+        :name="nameValidation"
+        v-model="modelValue as string"
+      />
+      <InputMask
+        unstyled  
+        v-if="tipo == 'telefone'"
+        class="w-full bg-surface-container-low border-none rounded-xl 
+               px-4 py-3.5 text-on-surface placeholder:text-outline 
+               focus:ring-2 focus:ring-primary/20 transition-all outline-none" 
+        placeholder="+55 (99) 99999-9999" 
+        mask="+55 (99) 99999-9999"
         :name="nameValidation"
         v-model="modelValue as string"
       />
@@ -79,7 +90,7 @@ const modelValue = defineModel('modelValue');
 interface Props {
   label: string,
   estilos?: string,
-  tipo: 'text' | 'password' | 'monetario'
+  tipo: 'text' | 'password' | 'monetario' | 'telefone'
   icone: string,  
   placeholder?: string,  
   nameValidation: string

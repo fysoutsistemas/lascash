@@ -17,9 +17,14 @@
         class="!bg-emerald-50 !w-40"
         size="large" 
         shape="circle"
+        :image="getFotoDoUsuario()"
         @click="toggleUserMenu"
       >
-        <i class="pi pi-user text-emerald-600"></i>
+        <i 
+          v-if="getFotoDoUsuario() == 'undefined' || getFotoDoUsuario() == ''" 
+          class="pi pi-user text-emerald-600"
+        >
+        </i>
       </Avatar>
 
       <Popover ref="userMenu">
@@ -91,6 +96,7 @@ const {
   getLogin, 
   getNomeCompleto,
   getNomeDaFamilia,
+  getFotoDoUsuario,
   logout,
   atualizarOcultarValores,
   getOcultarValores 

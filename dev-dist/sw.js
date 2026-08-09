@@ -67,7 +67,7 @@ if (!self.define) {
     });
   };
 }
-define(['./workbox-7e5eb42b'], (function (workbox) { 'use strict';
+define(['./workbox-970124e6'], (function (workbox) { 'use strict';
 
   self.skipWaiting();
   workbox.clientsClaim();
@@ -77,15 +77,25 @@ define(['./workbox-7e5eb42b'], (function (workbox) { 'use strict';
    * See https://goo.gl/S9QRab
    */
   workbox.precacheAndRoute([{
-    "url": "registerSW.js",
-    "revision": "3ca0b8505b4bec776b69afdba2768812"
-  }, {
     "url": "index.html",
-    "revision": "0.3mmhcm06sk8"
+    "revision": "0.20k8s7jo33c"
   }], {});
   workbox.cleanupOutdatedCaches();
   workbox.registerRoute(new workbox.NavigationRoute(workbox.createHandlerBoundToURL("index.html"), {
     allowlist: [/^\/$/]
   }));
+  workbox.registerRoute(({
+    url,
+    request
+  }) => request.method === "GET" && url.pathname.startsWith("/api/"), new workbox.NetworkFirst({
+    "cacheName": "api-cache",
+    "networkTimeoutSeconds": 10,
+    plugins: [new workbox.ExpirationPlugin({
+      maxEntries: 100,
+      maxAgeSeconds: 86400
+    }), new workbox.CacheableResponsePlugin({
+      statuses: [0, 200]
+    })]
+  }), 'GET');
 
 }));

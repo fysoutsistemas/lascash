@@ -3,9 +3,9 @@
     class="fixed bottom-0 left-0 right-0 bg-white border-t 
            border-slate-200 safe-area-bottom z-50 w-full max-w-md mx-auto"
   >
-    <div class="flex justify-around items-center py-3">
-      <button 
-        v-for="item in items" :key="item.label" 
+    <div class="flex justify-around items-center py-3">      
+      <button
+        v-for="item in itemsLiberados" :key="item.label"         
         :class="{ 
           'text-emerald-600': item.isAtivo,
           'text-slate-400': !item.isAtivo
@@ -35,5 +35,8 @@ const {
   items,   
   redirecionar  
 } = navigation;
+
+//Remove da lista qualquer item que não seja visivel
+const itemsLiberados = items.filter(i => i.isVisivel);
 
 </script>

@@ -50,6 +50,7 @@ clientHttp.interceptors.request.use(
 
       if (isTokenValido()){
         config.headers['Authorization'] = `Bearer ${getToken()}`;
+        config.headers['ngrok-skip-browser-warning'] = 'true';
       }else{        
         router.push("/login");
       }
@@ -86,7 +87,7 @@ clientHttp.interceptors.response.use(
     hideLoader();
 
     if (axios.isAxiosError(error)){
-      console.log(error.status);
+
       if (error.status === 401){
         router.push("/login");
       }else{

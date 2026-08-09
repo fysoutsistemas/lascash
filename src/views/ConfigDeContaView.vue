@@ -18,6 +18,9 @@
       </div>
     </header>
     <main id="main-edicao" class="flex-1 space-y-6 pb-10 bg-surface">
+
+      <input ref="fileInput" type="file" accept="image/*" class="hidden" @change="onFilePicked" />
+
       <Form 
         ref="formRef"
         v-slot="$form"
@@ -28,18 +31,37 @@
         <div class="px-6 pt-6 pb-32 max-w-lg mx-auto">
           <!-- Título da tela -->
           <div class="mb-10 flex items-center gap-5">
-            <div class="relative">
-              <Avatar label="P" class="mr-2" size="xlarge" />
-              
-              <div 
-                class="absolute -bottom-2 -right-2 p-2 rounded-xl
-                      bg-surface-container-lowest shadow-lg"
+
+            <div class="relative w-[85px] h-[85px] shrink-0">
+              <button 
+                type="button"            
+                class="w-[85px] h-[85px] rounded-[25px] border-2 border-dashed 
+                      border-amber-300 bg-amber-50 bg-cover bg-center flex flex-col 
+                      items-center justify-center gap-1 text-amber-600 
+                      active:scale-[0.96] transition shrink-0 overflow-hidden"
+                :style="contaEditada.foto ? { backgroundImage: 'url(' + contaEditada.foto + ')' } : {}"
+                @click="pickFormPhoto"       
               >
-                <span class="material-symbols-outlined text-primary !text-base">
-                  edit
-                </span>
-              </div>
+                <template v-if="!contaEditada.foto">              
+                  <i class="pi pi-camera text-3xl" style="font-size: 1.5rem"></i>
+                  <span class="text-[9.5px] font-bold leading-none">FOTO</span>
+                </template>
+              </button>
+              <button 
+                v-if="contaEditada.foto != ''" 
+                type="button" 
+                @click="contaEditada.foto = ''" 
+                title="Remover imagem"
+                class="absolute -left-1.5 -bottom-1.5 flex items-center gap-1 
+                      bg-white border-[1.5px] border-red-200 rounded-full pl-1.5 
+                      pr-2 py-0.5 text-[10px] font-extrabold text-red-500 
+                      shadow active:scale-90 transition"
+              >
+                <i class="pi pi-times text-sm"></i> 
+                Remover
+              </button>
             </div>
+            
             <div>
               <p class="text-on-surface-variant font-label text-xs uppercase tracking-widest mb-1">
                 Configurações de Conta
@@ -160,9 +182,10 @@ import { useRouter } from 'vue-router';
 import { usePerfilStore } from '@/composables/usePerfilStore';
 import { useToastService } from '@/composables/useToastService';
 import { plainToInstance } from 'class-transformer';
-import type ResumoDaContaDeUsuario from '@/dto/ResumoDaContaDeUsuario';
+import ResumoDaContaDeUsuario from '@/dto/ResumoDaContaDeUsuario';
 import ContaDeUsuarioEditada from '@/dto/ContaDeUsuarioEditada';
 import ContaDeUsuarioClient from '@/client/ContaDeUsuarioClient';
+import FileUtil from '@/util/FileUtil';
 
 const contaClient = new ContaDeUsuarioClient();
 
@@ -175,12 +198,15 @@ const perfilStore = usePerfilStore();
 const {
   getNomeCompleto,
   getNomeDaFamilia,
+  getFotoDoUsuario,
   atualizar
 } = perfilStore;  
 
 const formKey = ref(0);
 
 const formRef = ref();
+
+const fileInput = ref<any | null>(null);
 
 const isSenhaAtualInvalida = ref<boolean>(false);
 
@@ -198,6 +224,8 @@ const msgDeErroDaConfirmacao = ref<string>("");
 
 const contaEditada = ref<ContaDeUsuarioEditada>(new ContaDeUsuarioEditada());
 
+const tamanhoMaximoDaFoto = 1;// 1 megabyte
+
 const validatorResolver = ref(yupResolver(
   yup.object().shape({
     nomeCompleto: yup
@@ -212,6 +240,7 @@ const validatorResolver = ref(yupResolver(
 onMounted(() => {  
   contaEditada.value.nomeCompleto = getNomeCompleto();  
   contaEditada.value.nomeDaFamilia = getNomeDaFamilia();
+  contaEditada.value.foto = getFotoDoUsuario();
   formRef.value.reset();
 });
 
@@ -293,6 +322,47 @@ const salvar = ({ valid }: any ) => {
     
   }
 }
+
+const pickFormPhoto = () => {
+  fileInput.value.value = ''; 
+  fileInput.value.click(); 
+};
+
+const onFilePicked = (e: any) => {
+  
+  const file = e.target.files[0]; 
+
+  if (file){
+
+    const reader = new FileReader();
+
+    reader.onload = (ev: any) => {
+
+      let base64File = ev.target.result;
+      
+      if (FileUtil.isTamanhoLiberado(base64File, tamanhoMaximoDaFoto)){
+        contaEditada.value.foto = ev.target.result;
+      }else{
+
+        if (contaEditada.value.foto == undefined || contaEditada.value.foto == ''){
+          contaEditada.value.foto = "";
+        }
+        
+        toast.add({
+          severity: 'error',
+          summary: 'Erro',
+          detail: "A foto do perfil não deve ser maior que 1mb",
+          life: 3000,
+        });  
+
+      }
+    };
+
+    reader.readAsDataURL(file);
+
+  }
+
+};
 
 const redirectToMain = () => {
   router.push("/");

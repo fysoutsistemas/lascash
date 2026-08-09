@@ -1,6 +1,7 @@
 import { defineStore } from "pinia";
 import { ref } from "vue";
 import { useRouter } from 'vue-router';
+import { usePerfilStore } from '@/composables/usePerfilStore';
 
 export const useNavigationStore = defineStore('menu-selecionado', () => {  
 
@@ -9,15 +10,20 @@ export const useNavigationStore = defineStore('menu-selecionado', () => {
     label: string;
     rota: string;
     isAtivo: boolean;
+    isVisivel: boolean;
   }
 
   const router = useRouter();
 
+  const perfilStore = usePerfilStore();
+
+  const { isChefeDeFamilia } = perfilStore;
+
   const items = ref<ItemDeMenu[]>([
-    { icone: 'pi-home', label: 'INÍCIO',  rota: '/', isAtivo: false },
-    { icone: 'pi-shopping-cart', label: 'COMPRAS',  rota: '/', isAtivo: false },
-    { icone: 'pi-receipt', label: 'DESPESAS',  rota: '/despesas', isAtivo: false },
-    { icone: 'pi-chart-bar', label: 'INDICADORES',  rota: '/', isAtivo: false }
+    { icone: 'pi-home', label: 'INÍCIO',  rota: '/', isAtivo: false, isVisivel: true },
+    { icone: 'pi-shopping-cart', label: 'COMPRAS',  rota: '/painel-compras', isAtivo: false, isVisivel: true },
+    { icone: 'pi-receipt', label: 'DESPESAS',  rota: '/despesas', isAtivo: false, isVisivel: isChefeDeFamilia() },
+    { icone: 'pi-chart-bar', label: 'INDICADORES',  rota: '/', isAtivo: false, isVisivel: true }
   ]);
 
   const itemSelecionado = ref<ItemDeMenu>(items.value[0]);

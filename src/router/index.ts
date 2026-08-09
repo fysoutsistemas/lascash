@@ -10,10 +10,13 @@ import NovaContaView from '@/views/NovaContaView.vue';
 import GerenciarOrcamentoView from '@/views/GerenciarOrcamentoView.vue';
 import ConfigDeCategoriaView from '@/views/ConfigDeCategoriaView.vue';
 import NovoMembroView from '@/views/NovoMembroView.vue';
+import PainelDeComprasView from '@/views/PainelDeComprasView.vue';
+import ProdutosView from '@/views/ProdutosView.vue';
+import ListaDeCompraView from '@/views/ListaDeCompraView.vue';
 
 const perfilStore = usePerfilStore();
 
-const { isTokenValido, isCategsConfiguradas } = perfilStore;
+const { isTokenValido, isCategsConfiguradas, isChefeDeFamilia } = perfilStore;
 
 const routes: RouteRecordRaw[] = [
 
@@ -22,6 +25,42 @@ const routes: RouteRecordRaw[] = [
     component: HomeView,
     meta: {
       titulo: 'Home',
+      authentication: {
+        required: true
+      }
+    }
+  },
+
+  {
+    path: '/painel-compras',
+    component: PainelDeComprasView,
+    meta: {
+      titulo: 'Compras',
+      authentication: {
+        required: true
+      }
+    }
+  },
+
+  {
+    path: '/produtos',
+    component: ProdutosView,
+    meta: {
+      titulo: 'Produtos',
+      authentication: {
+        required: true
+      }
+    }
+  },
+
+  {
+    path: '/lista-compra/:idDaLista?',
+    component: ListaDeCompraView,
+    props: route => ({//Registra um parametro numérico e opcional
+      idDaLista: route.params.idDaLista ? Number(route.params.idDaLista) : undefined
+    }),
+    meta: {
+      titulo: 'Listas',
       authentication: {
         required: true
       }
@@ -184,9 +223,17 @@ router.beforeEach(async (to, _from, next) => {
       
       if (path === '/despesas'){
         if (!isCategsConfiguradas()){
-          return next({ path: '/config-categs' });
+          if (isChefeDeFamilia()){
+            return next({ path: '/config-categs' });
+          }else{
+            return next({ path: '/' });
+          }
         }
-      }  
+      } else if (path === '/config-categs') {
+        if (!isChefeDeFamilia()){
+          return next({ path: '/' });
+        }  
+      }
 
     }
 
