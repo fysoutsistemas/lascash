@@ -26,7 +26,7 @@
         <button 
           class="flex-1 flex flex-col items-center gap-2.5 bg-gray-100 
                  rounded-2xl pt-[18px] pb-3.5 px-1.5 active:scale-[0.96] transition"
-          @click="redirectToListas()"       
+          @click="redirectToMontagem()"
         >
           <span 
             class="w-[46px] h-[46px] rounded-xl bg-emerald-100 flex 
@@ -42,6 +42,7 @@
         <button 
           class="flex-1 flex flex-col items-center gap-2.5 bg-gray-100 
                  rounded-2xl pt-[18px] pb-3.5 px-1.5 active:scale-[0.96] transition"
+          @click="redirectToListagem()"       
         >
           <span 
             class="w-[46px] h-[46px] rounded-xl bg-emerald-100 flex 
@@ -96,8 +97,11 @@ const redirectToProdutos = () => {
   router.push("/produtos");
 }
 
-const redirectToListas = () => {
-  router.push("/lista-compra");
+const redirectToMontagem = () => {
+  router.push("/lista-compra/montagem");
 }
 
+const redirectToListagem = () => {
+  router.push("/lista-compra/listagem");
+}
 </script>

@@ -12,7 +12,8 @@ import ConfigDeCategoriaView from '@/views/ConfigDeCategoriaView.vue';
 import NovoMembroView from '@/views/NovoMembroView.vue';
 import PainelDeComprasView from '@/views/PainelDeComprasView.vue';
 import ProdutosView from '@/views/ProdutosView.vue';
-import ListaDeCompraView from '@/views/ListaDeCompraView.vue';
+import MontarListaView from '@/views/MontarListaView.vue';
+import ListasCriadasView from '@/views/ListasCriadasView.vue';
 
 const perfilStore = usePerfilStore();
 
@@ -54,13 +55,24 @@ const routes: RouteRecordRaw[] = [
   },
 
   {
-    path: '/lista-compra/:idDaLista?',
-    component: ListaDeCompraView,
+    path: '/lista-compra/montagem/:idDaLista?',
+    component: MontarListaView,
     props: route => ({//Registra um parametro numérico e opcional
       idDaLista: route.params.idDaLista ? Number(route.params.idDaLista) : undefined
     }),
     meta: {
-      titulo: 'Listas',
+      titulo: 'Montagem',
+      authentication: {
+        required: true
+      }
+    }
+  },
+
+  {
+    path: '/lista-compra/listagem',
+    component: ListasCriadasView,
+    meta: {
+      titulo: 'Listagem',
       authentication: {
         required: true
       }

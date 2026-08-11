@@ -14,14 +14,22 @@
       />
       <div class="flex-1 text-center">
         <h1 class="text-[19px] font-extrabold text-emerald-600">
-          {{ isEmEdicao ? 'Editar Lista' : 'Montar Lista' }}
+          {{ 
+            isEmEdicao 
+            ? 'Editar Lista' 
+            : 'Montar Lista' 
+          }}
         </h1>
         <p class="mt-0.5 text-[12.5px] text-slate-500">
-          {{ isEmEdicao ? 'Atualize os produtos e a quantidade' : 'Selecione os produtos do catálogo' }}
+          {{ 
+            isEmEdicao 
+            ? 'Atualize os produtos e a quantidade' 
+            : 'Selecione os produtos do catálogo' 
+          }}
         </p>
       </div>
       <span class="w-9 h-9 flex items-center justify-center text-emerald-600">
-        <i class="pi pi-check-square text-3xl"></i>
+        <i class="pi pi-list-check text-3xl"></i>
       </span>
     </header>
     <main class="flex-1 p-4 flex flex-col gap-4 pb-[104px]">
@@ -214,11 +222,10 @@
       </div>
       <Button 
         type="submit"
-        form="camposDaLista"
-        :disabled="false" 
+        form="camposDaLista"        
         class="!justify-center !bg-gradient-to-br !from-emerald-500 !to-emerald-600 
                !border-0 !rounded-xl !px-5 !py-3 !text-white !font-extrabold"
-        icon="pi pi-plus"
+        :icon="isEmEdicao ? 'pi pi-check' : 'pi pi-plus'"
         :label="isEmEdicao ? 'Salvar' : 'Criar Lista'"
       />
     </footer>
@@ -235,7 +242,7 @@ import { useConfirm, useToast } from 'primevue';
 import ProdutoClient from '@/client/ProdutoClient';
 import ListaDeCompraClient from '@/client/ListaDeCompraClient';
 import ListaDeCompra from '@/dto/ListaDeCompra';
-import type Produto from '@/dto/Produto';
+import Produto from '@/dto/Produto';
 import CurrencyUtil from '@/util/CurrencyUtil';
 import ItemDaListaResumido from '@/dto/ItemDaListaResumido';
 import ListaDeCompraSalva from '@/dto/ListaDeCompraSalva';
@@ -406,8 +413,13 @@ const atualizarTotal = () => {
   totalDaLista.value = 0.0;
 
   itensSelecionados.value.forEach((item: ItemDaListaResumido) => {
+
     let indice = produtos.value.findIndex(p => p.id == item.idDoProduto);
-    totalDaLista.value += item.qtde * Number(produtos.value[indice].precoEstimado);
+    
+    if (indice >= 0){
+      totalDaLista.value += item.qtde * Number(produtos.value[indice].precoEstimado);
+    }
+
   });    
 
 }
@@ -457,9 +469,9 @@ const redirectToPainel = () => {
         text: true
       },
       accept: async () => {
-        router.push("/painel-compras");    
+        router.push("/painel-compras");
       }
-    });  
+    });
 
   }else{
     router.push("/painel-compras");

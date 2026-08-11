@@ -3,6 +3,8 @@ import type ItemDoCarrinho from "@/dto/ItemDoCarrinho";
 import ListaDeCompra from "@/dto/ListaDeCompra";
 import type ListaDeCompraSalva from "@/dto/ListaDeCompraSalva";
 import NovaListaDeCompra from "@/dto/NovaListaDeCompra";
+import ResumoDaLista from "@/dto/ResumoDaLista";
+import { mapearPagina, type IPagina } from "@/util/PaginacaoUtil";
 import { plainToInstance } from "class-transformer";
 
 export default class ListaDeCompraClient {
@@ -25,21 +27,44 @@ export default class ListaDeCompraClient {
     return plainToInstance(ListaDeCompra, response.data as ListaDeCompra);
   }
 
-  public async listarTodas(): Promise<ListaDeCompra[]> {
+  public async listarTodasPor(status?: string, pagina?: number): Promise<IPagina<ListaDeCompra>> {
+    
+    let paramStatus = status == "TODAS" ? null : status;
+    
+    const params = {
+      'status': paramStatus,
+      'pagina': pagina
+    }
 
-    let listas: ListaDeCompra[] = [];
+    const response = await clientHttp.get(this.URI, { params });
 
-    const response = await clientHttp.get(`${this.URI}`);
+    return mapearPagina(response, ListaDeCompra);
+
+  }
+
+  public async listarResumos(): Promise<ResumoDaLista[]> {
+
+    let resumos: ResumoDaLista[] = [];
+
+    const response = await clientHttp.get(`${this.URI}/resumos`);
+
+    let total = 0;
 
     if (response.data){
 
-      response.data.forEach((lista: ListaDeCompra) => {
-        listas.push(plainToInstance(ListaDeCompra, lista as ListaDeCompra));
+      console.log(response.data);
+
+      response.data.forEach((resumo: ResumoDaLista) => {
+        total += resumo.qtde;
       });
 
     }
-    
-    return listas;
+
+    resumos.push(new ResumoDaLista("TODAS", total));
+
+    resumos.push(...response.data);  
+
+    return resumos;
 
   }
 
