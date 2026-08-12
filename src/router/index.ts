@@ -14,6 +14,7 @@ import PainelDeComprasView from '@/views/PainelDeComprasView.vue';
 import ProdutosView from '@/views/ProdutosView.vue';
 import MontarListaView from '@/views/MontarListaView.vue';
 import ListasCriadasView from '@/views/ListasCriadasView.vue';
+import CompraView from '@/views/CompraView.vue';
 
 const perfilStore = usePerfilStore();
 
@@ -62,6 +63,20 @@ const routes: RouteRecordRaw[] = [
     }),
     meta: {
       titulo: 'Montagem',
+      authentication: {
+        required: true
+      }
+    }
+  },
+
+  {
+    path: '/lista-compra/executar/:idDaLista',
+    component: CompraView,
+    props: route => ({ 
+      idDaLista: Number(route.params.idDaLista) 
+    }) ,
+    meta: {
+      titulo: 'Compra',
       authentication: {
         required: true
       }

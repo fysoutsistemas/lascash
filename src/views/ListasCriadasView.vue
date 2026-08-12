@@ -17,7 +17,7 @@
           Listas Criadas
         </h1>
         <p class="mt-0.5 text-[12.5px] text-slate-500">
-          {{ listasCriadas.length + ' listas criadas'}}
+          {{ filtros[0]?.qtde + ' listas criadas'}}
         </p>
       </div>
       <span class="w-9 h-9 flex items-center justify-center text-emerald-600">
@@ -126,6 +126,7 @@
           <button 
             class="flex items-center gap-1.5 text-[12.5px] font-bold text-emerald-700 
                    bg-emerald-100 rounded-[9px] px-3.5 py-2 active:scale-95 transition"
+            @click="abrir(lista as ListaDeCompra)"       
           >
             Abrir <i class="pi pi-chevron-right"></i>
           </button>
@@ -280,6 +281,10 @@ const carregarMais = () => {
 
   }  
 
+}
+
+const abrir = (listaSel: ListaDeCompra) => {
+  router.push(`/lista-compra/executar/${listaSel.id}`)
 }
 
 const redirectToEdicao = (listaSel: ListaDeCompra) => {

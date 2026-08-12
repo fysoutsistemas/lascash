@@ -52,8 +52,6 @@ export default class ListaDeCompraClient {
 
     if (response.data){
 
-      console.log(response.data);
-
       response.data.forEach((resumo: ResumoDaLista) => {
         total += resumo.qtde;
       });
@@ -82,7 +80,7 @@ export default class ListaDeCompraClient {
   }
 
   public async retirarDoCarrinhoPor(idDaLista: number, idDoProduto: number): Promise<void> {
-    await clientHttp.put(`${this.URI}/${idDaLista}/produto/${idDoProduto}/carrinho`);  
+    await clientHttp.delete(`${this.URI}/${idDaLista}/produto/${idDoProduto}/carrinho`);  
   }
 
 }

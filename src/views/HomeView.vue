@@ -317,7 +317,7 @@ const showLinkDialog = () => {
 }
 
 const copyLink = async () => {
-  console.log(navigator);
+
   await navigator.clipboard.writeText(linkDoNovoMembro.value);
 
   toast.add({

@@ -469,12 +469,22 @@ const redirectToPainel = () => {
         text: true
       },
       accept: async () => {
-        router.push("/painel-compras");
+
+        if (isEmEdicao.value){
+          router.push("//lista-compra/listagem");
+        }else{
+          router.push("/painel-compras");
+        }
+
       }
     });
 
   }else{
-    router.push("/painel-compras");
+    if (isEmEdicao.value){
+      router.push("/lista-compra/listagem");
+    }else{
+      router.push("/painel-compras");
+    }
   }
 
 }
