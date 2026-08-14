@@ -23,7 +23,8 @@ export default class ListaDeCompra {
     public flAtivo: string = "A",
     itens?: ItemDaLista[],
     public loginCriador: string = "",
-    public loginComprador: string = ""
+    public loginComprador: string = "",
+    public flRecorrente: string = "N"
   ){
     this._familia = familia ?? new Familia();
     this._dataDeMovto = dataDeMovto ?? new Date();

@@ -25,12 +25,21 @@
             }}
           </p>
         </div>
-        <span 
-          class="text-[11px] font-extrabold px-2.5 py-[5px]  
-                 rounded-full uppercase tracking-wide shrink-0" 
-          :class="STATUS_CHIP[lista.status]"
-        >
-          {{ lista.status }}
+        <span class="flex items-center gap-1.5 shrink-0">
+          <span 
+            v-if="lista.flRecorrente == 'N'" 
+            title="Lista recorrente" class="flex items-center justify-center 
+                   px-[7px] py-[5px] rounded-full bg-teal-100 text-teal-700"
+          >              
+            <i class="pi pi-replay" style="font-size: 1rem"></i>
+          </span>
+          <span 
+            class="text-[11px] font-extrabold px-2.5 py-[5px]  
+                  rounded-full uppercase tracking-wide shrink-0" 
+            :class="STATUS_CHIP[lista.status]"
+          >
+            {{ lista.status }}
+          </span>
         </span>
       </div>
       <div class="flex gap-2">
@@ -253,6 +262,7 @@ import Produto from '@/dto/Produto';
 import ItemDaLista from '@/dto/ItemDaLista';
 import Swal from 'sweetalert2';
 import ItemDoCarrinho from '@/dto/ItemDoCarrinho';
+import ListaDeCompraEncerrada from '@/dto/ListaDeCompraEncerrada';
 
 const router = useRouter();
 
@@ -293,7 +303,7 @@ const encerrar = () => {
 
   confirmacao.require({    
     message: 'Deseja realmente encerrar a compra?',
-    header: 'Confirmação',    
+    header: 'Encerramento',    
     rejectProps: {
       label: 'Cancelar',
       severity: 'secondary',
@@ -303,16 +313,56 @@ const encerrar = () => {
       label: 'Confirmar',
       text: true
     },
-    accept: async () => {
+    accept: () => {
 
-      listaClient.encerrarListaPor(lista.value.id)
-        .then(() => {
-          lista.value.status = "ENCERRADA"
-        });
+      if (toNumber(lista.value.totalDaCompra) > 0.0){
+
+        setTimeout(() => {
+          confirmarLancto();
+        }, 200);
+
+      }else{
+        encerrarLista("N");
+      }
 
     }
   });
+  
+}
 
+const confirmarLancto = () => {
+
+  confirmacao.require({    
+    message: `Deseja lançar o valor ${CurrencyUtil.toBRL(lista.value.totalDaCompra)} como despesa?`,
+    header: 'Lançamento',    
+    rejectProps: {
+      label: 'Cancelar',
+      severity: 'secondary',
+      text: true
+    },
+    acceptProps: {
+      label: 'Confirmar',
+      text: true
+    },
+    accept: () => {
+      encerrarLista("S");
+    },
+    reject: () => {  
+      encerrarLista("N");  
+    }
+
+  });
+
+}
+
+const encerrarLista = (flagLancarDespesa: string) => {
+
+  let listaAtualizada = new ListaDeCompraEncerrada(lista.value.id, flagLancarDespesa);
+  
+  listaClient.encerrar(listaAtualizada)
+    .then(() => {
+      lista.value.status = "ENCERRADA"
+    });
 
 }
 

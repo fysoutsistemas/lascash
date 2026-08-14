@@ -1,11 +1,12 @@
-import clientHttp from "@/composables/useAxios";
-import type ItemDoCarrinho from "@/dto/ItemDoCarrinho";
-import ListaDeCompra from "@/dto/ListaDeCompra";
-import type ListaDeCompraSalva from "@/dto/ListaDeCompraSalva";
-import NovaListaDeCompra from "@/dto/NovaListaDeCompra";
-import ResumoDaLista from "@/dto/ResumoDaLista";
 import { mapearPagina, type IPagina } from "@/util/PaginacaoUtil";
 import { plainToInstance } from "class-transformer";
+import clientHttp from "@/composables/useAxios";
+import ItemDoCarrinho from "@/dto/ItemDoCarrinho";
+import ListaDeCompra from "@/dto/ListaDeCompra";
+import ListaDeCompraEncerrada from "@/dto/ListaDeCompraEncerrada";
+import ListaDeCompraSalva from "@/dto/ListaDeCompraSalva";
+import NovaListaDeCompra from "@/dto/NovaListaDeCompra";
+import ResumoDaLista from "@/dto/ResumoDaLista";
 
 export default class ListaDeCompraClient {
 
@@ -71,8 +72,8 @@ export default class ListaDeCompraClient {
     return plainToInstance(ListaDeCompra, response.data as ListaDeCompra);
   }
 
-  public async encerrarListaPor(idDaLista: number): Promise<void>{
-    await clientHttp.put(`${this.URI}/${idDaLista}/encerrar`);
+  public async encerrar(lista: ListaDeCompraEncerrada): Promise<void>{
+    await clientHttp.put(`${this.URI}/encerrar`, lista);
   }
 
   public async adicionarNoCarrinhoPor(idDaLista: number, item: ItemDoCarrinho): Promise<void> {

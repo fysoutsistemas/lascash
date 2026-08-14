@@ -75,12 +75,21 @@
               {{ lista.qtde }} {{ lista.qtde === 1 ? 'item' : 'itens' }}
             </span>
           </div>
-          <span 
-            class="text-[11px] font-extrabold px-2.5 py-[5px] 
-                   rounded-full uppercase tracking-wide shrink-0" 
-            :class="STATUS_CLASS[lista.status]"
-          >
-            {{ lista.status }}
+          <span class="flex items-center gap-1.5 shrink-0">
+            <span 
+              v-if="lista.flRecorrente == 'S'" 
+              title="Lista recorrente" class="flex items-center justify-center 
+                     px-[7px] py-[5px] rounded-full bg-teal-100 text-teal-700"
+            >              
+              <i class="pi pi-replay" style="font-size: 1rem"></i>
+            </span>
+            <span 
+              class="text-[11px] font-extrabold px-2.5 py-[5px] 
+                    rounded-full uppercase tracking-wide shrink-0" 
+              :class="STATUS_CLASS[lista.status]"
+            >
+              {{ lista.status }}
+            </span>
           </span>
         </div>
         <div class="flex items-center gap-[18px] border-t border-slate-100 pt-3">
@@ -142,6 +151,7 @@
         <i class="pi pi-chevron-down text-slate-400" style="font-size: 1.5rem"></i> Carregar Mais
       </button>
     </main>
+    <MenuInferior/>
   </div>
   <GlobalLoading />
 </template>
@@ -288,10 +298,12 @@ const abrir = (listaSel: ListaDeCompra) => {
 }
 
 const redirectToEdicao = (listaSel: ListaDeCompra) => {
+  localStorage.setItem("ultimaTela", "/lista-compra/listagem");
   router.push(`/lista-compra/montagem/${listaSel.id}`)
 }
 
 const redirectToPainel = () => {
+  localStorage.removeItem("ultimaTela");
   router.push("/painel-compras");
 }
 </script>

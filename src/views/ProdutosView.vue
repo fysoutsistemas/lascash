@@ -10,7 +10,7 @@
         class="!w-[34px] !h-[34px] !text-emerald-600" 
         aria-label="Voltar"
         icon="pi pi-arrow-left"
-        @click="redirectToPainel()"
+        @click="voltar()"
       />
       <div class="flex-1 text-center">
         <h1 class="text-[19px] font-extrabold text-emerald-600">Cadastrar Produtos</h1>
@@ -538,7 +538,7 @@ const listarCategs = () => {
   });
 } 
 
-const redirectToPainel = () => {
-  router.push("/painel-compras");
+const voltar = () => {
+  router.push(localStorage.getItem("ultimaTela") ?? "/painel-compras");
 }
 </script>

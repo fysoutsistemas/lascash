@@ -7,7 +7,8 @@ export default class NovaListaDeCompra {
 
   constructor(
     public nome: string = "",
-    itens: ItemDaListaResumido[]
+    itens: ItemDaListaResumido[],
+    public flRecorrente: string = "N"
   ){
     this._itens = itens ?? [];
   }

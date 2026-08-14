@@ -20,7 +20,7 @@
           <span 
             class="text-xs font-bold text-gray-700 text-center leading-snug"
           >
-            Cadastrar Produtos
+            Criar Produtos
           </span>
         </button>
         <button 

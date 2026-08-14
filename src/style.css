@@ -166,7 +166,19 @@ body, html {
 }
 
 .swal2-popup.larcash-popup .swal2-icon.swal2-warning { 
-  border-color: #fcd34d; color: #d97706; 
+  border-color: #fcd34d; 
+  color: #d97706; 
+}
+
+.swal2-popup.larcash-popup .larcash-cancel { 
+  background: #f1f5f9; 
+  border: none; 
+  border-radius: 12px; 
+  padding: 12px 24px; 
+  color: #475569; 
+  font-size: 14.5px; 
+  font-weight: 800; 
+  margin-left: 8px; 
 }
 
 @media (max-width: 768px) {

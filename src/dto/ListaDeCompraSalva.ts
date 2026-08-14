@@ -8,7 +8,8 @@ export default class ListaDeCompraSalva {
   constructor(
     public id: number = 0,
     public nome: string = "",
-    itens: ItemDaListaResumido[]
+    itens: ItemDaListaResumido[],
+    public flRecorrente: string = "N"
   ){
     this._itens = itens ?? [];
   }

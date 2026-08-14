@@ -10,7 +10,7 @@
         class="!w-[34px] !h-[34px] !text-emerald-600" 
         aria-label="Voltar"
         icon="pi pi-arrow-left"
-        @click="redirectToPainel()"
+        @click="voltar()"
       />
       <div class="flex-1 text-center">
         <h1 class="text-[19px] font-extrabold text-emerald-600">
@@ -47,30 +47,80 @@
           class="bg-white flex flex-col rounded-[18px] px-[18px] py-4 
                  shadow-[0_4px_16px_rgba(15,23,42,0.06)] gap-2.5"
         >
-          <label 
-            class="text-[11.5px] font-bold text-slate-500 uppercase tracking-wide"
+          <div class="flex flex-col gap-2.5">
+            <label 
+              class="text-[11.5px] font-bold text-slate-500 uppercase tracking-wide"
+            >
+              Nome da lista
+            </label>
+            <InputText 
+              id="nome"
+              v-model="lista.nome" 
+              name="nome"
+              type="text"
+              placeholder="Ex: Compras da Semana" 
+              class="w-full flex-1" 
+              @blur="() => isAlterado = lista.nome != nomeInicialDaLista"
+            />
+            <Message
+              v-if="$form.nome?.invalid"
+              severity="error"
+              size="small"
+              variant="simple"
+            >
+              {{ $form.nome?.error.message }}
+            </Message>
+          </div>
+          <button 
+            type="button" 
+            @click="alternarSelecaoDeRecorrencia" 
+            class="flex items-center gap-2.5 bg-transparent border-0 
+                   p-0 text-left active:scale-[0.99] transition"
           >
-            Nome da lista
-          </label>
-          <InputText 
-            id="nome"
-            v-model="lista.nome" 
-            name="nome"
-            type="text"
-            placeholder="Ex: Compras da Semana" 
-            class="w-full flex-1" 
-            @blur="() => isAlterado = lista.nome != nomeInicialDaLista"
-          />
-          <Message
-            v-if="$form.nome?.invalid"
-            severity="error"
-            size="small"
-            variant="simple"
-          >
-            {{ $form.nome?.error.message }}
-          </Message>
+            <span 
+              class="w-[22px] h-[22px] rounded-md border-2 flex 
+                     items-center justify-center text-white shrink-0" 
+              :class="lista.flRecorrente == 'S'
+                      ? 'bg-emerald-500 border-emerald-500' 
+                      : 'bg-white border-slate-300'"
+            >              
+              <i v-if="lista.flRecorrente == 'S'" class="pi pi-check text-white"></i>
+            </span>
+            <span class="flex flex-col gap-px">
+              <strong class="text-[13.5px] font-extrabold text-slate-800">
+                Lista recorrente
+              </strong>
+              <span class="text-[11.5px] text-slate-500">
+                Permanece ativa, sem encerramento
+              </span>
+            </span>
+          </button>
         </section>  
       
+        <button        
+          type="button"
+          class="flex items-center gap-3 bg-white border-[1.5px] 
+                 border-dashed border-emerald-300 rounded-[14px] px-4 
+                 py-3.5 text-left w-full active:scale-[0.99] transition"
+          @click="redirectToProduto"       
+        >
+          <span 
+            class="w-[38px] h-[38px] rounded-[10px] bg-emerald-100 flex 
+                   items-center justify-center text-emerald-600 shrink-0"
+          >            
+            <i class="pi pi-plus text-emerald-600"  style="font-size: 1rem"></i>
+          </span>
+          <span class="flex-1 flex flex-col gap-0.5">
+            <strong class="text-sm font-extrabold text-slate-800">
+              Cadastrar Produtos
+            </strong>
+            <span class="text-[11.5px] text-slate-500">
+              Não encontrou? Basta criar!
+            </span>
+          </span> 
+          <i class="pi pi-chevron-right text-emerald-600" style="font-size: 0.9rem"></i>
+        </button>
+
         <div 
           class="flex items-center gap-2.5 bg-white border-[1.5px] 
                  border-slate-200 rounded-xl px-3.5"
@@ -239,6 +289,7 @@ import { onMounted, ref } from 'vue';
 import { yupResolver } from '@primevue/forms/resolvers/yup';
 import { useRouter } from 'vue-router';
 import { useConfirm, useToast } from 'primevue';
+import { instanceToPlain, plainToInstance } from 'class-transformer';
 import ProdutoClient from '@/client/ProdutoClient';
 import ListaDeCompraClient from '@/client/ListaDeCompraClient';
 import ListaDeCompra from '@/dto/ListaDeCompra';
@@ -247,6 +298,7 @@ import CurrencyUtil from '@/util/CurrencyUtil';
 import ItemDaListaResumido from '@/dto/ItemDaListaResumido';
 import ListaDeCompraSalva from '@/dto/ListaDeCompraSalva';
 import NovaListaDeCompra from '@/dto/NovaListaDeCompra';
+import Swal from 'sweetalert2';
 
 const formRef = ref();
 
@@ -286,31 +338,69 @@ const validatorResolver = ref(yupResolver(
   })
 ));
 
-onMounted(async () => {
-
+onMounted(async () => {  
+  
   isEmEdicao.value = props.idDaLista != undefined;
 
   produtos.value = await produtoClient.listarAtivos();
-
+  
   produtosFiltrados.value = produtos.value;
   
-  if (isEmEdicao.value){
+  if (isListaEmCache()){
 
-    lista.value = await listaDeCompraClient.buscarPor(props.idDaLista as number);
+    loadCacheEmTela();
 
-    formRef.value.setValues({ ...lista.value });
+    limparCacheDeTela();
 
-    nomeInicialDaLista.value = lista.value.nome;
+  }else{
+    
+    if (isEmEdicao.value){
+  
+      lista.value = await listaDeCompraClient.buscarPor(props.idDaLista as number);
+  
+      formRef.value.setValues({ ...lista.value });
+  
+      nomeInicialDaLista.value = lista.value.nome;
+  
+      itensSelecionados.value = lista.value.itens.map(il => {
+        return new ItemDaListaResumido(il.produto.id, il.qtde, il.ordem);
+      });
+  
+      atualizarTotal();
+  
+    }
 
-    itensSelecionados.value = lista.value.itens.map(il => {
-      return new ItemDaListaResumido(il.produto.id, il.qtde, il.ordem);
-    });
-
-    atualizarTotal();
-
-  }  
+  }
 
 });
+
+const isListaEmCache = (): boolean => {
+  return localStorage.getItem("listaDaTela") != null;
+}
+
+const loadCacheEmTela = () => {
+
+  let listaJson = JSON.parse(localStorage.getItem("listaDaTela") ?? "");
+  lista.value = plainToInstance(ListaDeCompra, listaJson as ListaDeCompra);
+
+  let itensJson = JSON.parse(localStorage.getItem("itensSelsDaLista") ?? "");
+  itensSelecionados.value = itensJson as ItemDaListaResumido[];
+
+  formRef.value.setValues({ ...lista.value });
+
+}
+
+const limparCacheDeTela = () => {
+  localStorage.removeItem("listaDaTela");  
+  localStorage.removeItem("itensSelsDaLista");    
+  localStorage.removeItem("ultimaTela");  
+}
+
+const salvarCache = () => {
+  localStorage.setItem("listaDaTela", JSON.stringify(instanceToPlain(lista.value)));
+  localStorage.setItem("itensSelsDaLista", JSON.stringify(instanceToPlain(itensSelecionados.value)));
+  localStorage.setItem("ultimaTela", "/lista-compra/montagem");  
+}
 
 //Declara uma propriedade numérica e opcional
 //Será lido na montagem do componente
@@ -321,12 +411,12 @@ const props = defineProps<{
 const salvar = ({ valid }: any) => {
     
   if (valid){
-
+    
     if (isEmEdicao.value){
 
-      let listaSalva = new ListaDeCompraSalva(lista.value.id, 
-          lista.value.nome, itensSelecionados.value);
-
+      let listaSalva = new ListaDeCompraSalva(lista.value.id, lista.value.nome, 
+          itensSelecionados.value, lista.value.flRecorrente);      
+      
       listaDeCompraClient.alterar(listaSalva).then((_: ListaDeCompra) => {
 
         filtroPorNome.value = "";
@@ -344,8 +434,9 @@ const salvar = ({ valid }: any) => {
 
     }else{
 
-      let novaLista = new NovaListaDeCompra(lista.value.nome, itensSelecionados.value);
-
+      let novaLista = new NovaListaDeCompra(lista.value.nome, 
+          itensSelecionados.value, lista.value.flRecorrente);      
+      
       listaDeCompraClient.inserir(novaLista).then((listaSalva: ListaDeCompra) => {
 
         lista.value.id = listaSalva.id;
@@ -372,6 +463,26 @@ const salvar = ({ valid }: any) => {
   document.getElementById("painel-lista")?.scrollIntoView();
 
 }  
+
+const alternarSelecaoDeRecorrencia = () => {
+
+  lista.value.flRecorrente = lista.value.flRecorrente == 'S' ? 'N' : 'S';
+
+  if (lista.value.flRecorrente == 'S'){
+    Swal.fire({
+      icon: 'info',
+      title: 'Lista recorrente',
+      text: 'Listas recorrentes não são encerradas: elas permanecem ativas para reuso contínuo até que você desmarque esta opção.',
+      confirmButtonText: 'Entendi',
+      buttonsStyling: false,
+      customClass: { 
+        popup: 'larcash-popup', 
+        confirmButton: 'larcash-confirm' 
+      }
+    });
+  }
+
+}
 
 const alternarSelecaoDo = (prodSel: Produto) => {
 
@@ -452,7 +563,13 @@ const listarPorDescricao = () => {
   });  
 }
 
-const redirectToPainel = () => {
+const redirectToProduto = () => {
+  //Armazena as informações em localstorage para pode continuar o cadastro
+  salvarCache();
+  router.push("/produtos");
+}
+
+const voltar = () => {
 
   if (isAlterado.value){
 
@@ -469,22 +586,12 @@ const redirectToPainel = () => {
         text: true
       },
       accept: async () => {
-
-        if (isEmEdicao.value){
-          router.push("//lista-compra/listagem");
-        }else{
-          router.push("/painel-compras");
-        }
-
+        router.push(localStorage.getItem("ultimaTela") ?? "/painel-compras");
       }
     });
 
   }else{
-    if (isEmEdicao.value){
-      router.push("/lista-compra/listagem");
-    }else{
-      router.push("/painel-compras");
-    }
+    router.push(localStorage.getItem("ultimaTela") ?? "/painel-compras");
   }
 
 }
