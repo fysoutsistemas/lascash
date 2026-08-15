@@ -7,6 +7,7 @@ import ListaDeCompraEncerrada from "@/dto/ListaDeCompraEncerrada";
 import ListaDeCompraSalva from "@/dto/ListaDeCompraSalva";
 import NovaListaDeCompra from "@/dto/NovaListaDeCompra";
 import ResumoDaLista from "@/dto/ResumoDaLista";
+import DashboardDeCompras from "@/dto/DashboardDeCompras";
 
 export default class ListaDeCompraClient {
 
@@ -65,6 +66,11 @@ export default class ListaDeCompraClient {
 
     return resumos;
 
+  }
+
+  public async buscarDashboard(): Promise<DashboardDeCompras> {
+    const response = await clientHttp.get(`${this.URI}/dashboard/me`);
+    return plainToInstance(DashboardDeCompras, response.data as DashboardDeCompras);
   }
 
   public async inativarPor(id: number): Promise<ListaDeCompra> {
