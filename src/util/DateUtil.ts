@@ -219,4 +219,26 @@ export default class DateUtil {
     
     return datas;
   }
+
+  static converterAnoMesEmDesc(dataParaConversao: Date): string {
+
+    const mesExtenso = this.converterMesEmDesc(dataParaConversao.getMonth());
+
+    const ano = dataParaConversao.getFullYear();
+    
+    return `${mesExtenso} de ${ano}`;
+
+  }
+
+  static converterMesEmDesc(mesOrdinal: number): string {
+    
+    const meses = [
+      'Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho',
+      'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'
+    ];
+    
+    return meses[mesOrdinal];
+
+  }
+
 }

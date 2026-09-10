@@ -159,18 +159,19 @@
 <script setup lang="ts">
 import { onMounted, ref } from 'vue';
 import { useRouter } from 'vue-router';
-import { useConfirm, useToast } from 'primevue';
+import { useConfirm } from 'primevue';
+import { useSweetAlert2 } from '@/composables/useSweetAlert2';
+import type { IPagina } from '@/util/PaginacaoUtil';
 import ListaDeCompraClient from '@/client/ListaDeCompraClient';
 import ListaDeCompra from '@/dto/ListaDeCompra';
 import CurrencyUtil from '@/util/CurrencyUtil';
 import ResumoDaLista from '@/dto/ResumoDaLista';
-import type { IPagina } from '@/util/PaginacaoUtil';
 
 const router = useRouter();
 
-const toast = useToast();
-
 const confirmacao = useConfirm();
+
+const alert = useSweetAlert2();
 
 const listaClient = new ListaDeCompraClient();
 
@@ -237,12 +238,7 @@ const remover = (listaSel: ListaDeCompra) => {
               listasCriadas.value.splice(indice, 1);
             }
 
-            toast.add({
-              severity: 'success',
-              summary: 'Sucesso',
-              detail: `A lista ${ listaRemovida.nome } removida com sucesso`,
-              life: 3000,
-            });
+            alert.showSuccess(`A lista ${ listaRemovida.nome } removida com sucesso`);            
 
           });
 

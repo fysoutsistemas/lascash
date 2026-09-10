@@ -1,8 +1,8 @@
-import { usePerfilStore } from '@/composables/usePerfilStore';
-import axios, { type AxiosResponse, type InternalAxiosRequestConfig } from 'axios';
 import { ref } from 'vue';
-import { useToastService } from './useToastService';
+import { usePerfilStore } from '@/composables/usePerfilStore';
 import { instanceToPlain } from 'class-transformer';
+import { useSweetAlert2 } from './useSweetAlert2';
+import axios, { type AxiosResponse, type InternalAxiosRequestConfig } from 'axios';
 import router from "@/router";
 
 export const isLoading = ref(false);
@@ -11,7 +11,7 @@ const perfilStore = usePerfilStore();
 
 const { isTokenValido, getToken } = perfilStore;
 
-const toast = useToastService();
+const alert = useSweetAlert2();
 
 let contadorDeCarregamento = 0;
 
@@ -64,12 +64,7 @@ clientHttp.interceptors.request.use(
 
     hideLoader();
 
-    toast.add({
-      severity: 'error',
-      summary: 'Erro',
-      detail: error,
-      life: 3000,
-    });
+    alert.showError(error);
 
     return Promise.reject(error);
 
@@ -92,34 +87,16 @@ clientHttp.interceptors.response.use(
         router.push("/login");
       }else{
 
-        if (error.status === 400){
+        let msg = error.status === 400 
+                  ? error.response?.data.erros[0].mensagem 
+                  : error.message;
 
-          toast.add({
-            severity: 'error',
-            summary: 'Erro',
-            detail: error.response?.data.erros[0].mensagem,
-            life: 3000,
-          });
-  
-        }else{
-
-          toast.add({
-            severity: 'error',
-            summary: 'Erro',
-            detail: error.message,
-            life: 3000,
-          });
-        }
+        alert.showError(msg);
   
       }
 
     }else{
-      toast.add({
-        severity: 'error',
-        summary: 'Erro',
-        detail: error,
-        life: 3000,
-      });
+      alert.showError(error);
     }
 
     return Promise.reject(error);

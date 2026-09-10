@@ -181,6 +181,10 @@ body, html {
   margin-left: 8px; 
 }
 
+.lowercase-input {
+  text-transform: lowercase;
+}
+
 @media (max-width: 768px) {
   .p-toast {
     width: calc(100vw - 1rem);

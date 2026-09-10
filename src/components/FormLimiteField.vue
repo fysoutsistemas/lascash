@@ -7,14 +7,14 @@
     <div class="flex items-center justify-between">
       <div class="flex items-center gap-4">
         <div
-          class="mr-1 w-10 h-10 rounded-full flex items-center justify-center text-white"
+          class="w-8 h-8 rounded-full flex items-center justify-center text-white"
           :style="{
             'background-color': `${cor}`
           }"
         >
-          <i class="fa-solid" :class="icone"></i>
+          <i class="fa-solid" :class="icone" style="font-size: 0.8rem"></i>
         </div>
-        <label class="font-bold text-on-surface truncate">
+        <label class="font-bold text-on-surface truncate text-sm ">
           {{ label }}
         </label>
       </div>

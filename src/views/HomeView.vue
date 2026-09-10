@@ -257,9 +257,9 @@
 import { onMounted, ref } from 'vue';
 import { useRouter } from 'vue-router';
 import { usePerfilStore } from '@/composables/usePerfilStore';
-import { useToast } from 'primevue';
 import { usePwaUpdate } from '@/composables/usePwaUpdate';
 import { usePwaInstall } from '@/composables/usePwaInstall';
+import { useSweetAlert2 } from '@/composables/useSweetAlert2';
 import OrcamentoClient from '@/client/OrcamentoClient';
 import ProgressoDoOrcamento from '@/dto/ProgressoDoOrcamento';
 import CurrencyUtil from '@/util/CurrencyUtil';
@@ -275,7 +275,7 @@ const {
   promptInstall 
 } = usePwaInstall()
 
-const toast = useToast();
+const alert = useSweetAlert2();
 
 const router = useRouter();
 
@@ -320,12 +320,7 @@ const copyLink = async () => {
 
   await navigator.clipboard.writeText(linkDoNovoMembro.value);
 
-  toast.add({
-    severity: 'success',
-    summary: 'Sucesso',
-    detail: 'Link copiado com sucesso',
-    life: 3000,
-  });
+  alert.showSuccess("Link copiado com sucesso");
 
 }
 

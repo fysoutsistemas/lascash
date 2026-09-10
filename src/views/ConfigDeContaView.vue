@@ -175,13 +175,13 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, ref } from 'vue';
 import * as yup from 'yup';
+import { onMounted, ref } from 'vue';
 import { yupResolver } from '@primevue/forms/resolvers/yup';
 import { useRouter } from 'vue-router';
 import { usePerfilStore } from '@/composables/usePerfilStore';
-import { useToastService } from '@/composables/useToastService';
 import { plainToInstance } from 'class-transformer';
+import { useSweetAlert2 } from '@/composables/useSweetAlert2';
 import ResumoDaContaDeUsuario from '@/dto/ResumoDaContaDeUsuario';
 import ContaDeUsuarioEditada from '@/dto/ContaDeUsuarioEditada';
 import ContaDeUsuarioClient from '@/client/ContaDeUsuarioClient';
@@ -191,7 +191,7 @@ const contaClient = new ContaDeUsuarioClient();
 
 const router = useRouter();
 
-const toast = useToastService();
+const alert = useSweetAlert2();
 
 const perfilStore = usePerfilStore();
 
@@ -312,12 +312,7 @@ const salvar = ({ valid }: any ) => {
       limparCamposDeSenha();
       ativarReset(); 
       document.getElementById("main-edicao")?.scrollIntoView();
-      toast.add({
-        severity: 'success',
-        summary: 'Sucesso',
-        detail: "Dados salvos com sucesso",
-        life: 3000,
-      });     
+      alert.showSuccess("Dados salvos com sucesso");
     });
     
   }
@@ -347,14 +342,9 @@ const onFilePicked = (e: any) => {
         if (contaEditada.value.foto == undefined || contaEditada.value.foto == ''){
           contaEditada.value.foto = "";
         }
-        
-        toast.add({
-          severity: 'error',
-          summary: 'Erro',
-          detail: "A foto do perfil não deve ser maior que 1mb",
-          life: 3000,
-        });  
 
+        alert.showError("A foto do perfil não deve ser maior que 1mb");
+        
       }
     };
 

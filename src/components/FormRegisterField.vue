@@ -34,22 +34,24 @@
         class="w-full bg-surface-container-low border-none rounded-xl 
                px-4 py-3.5 text-on-surface placeholder:text-outline 
                focus:ring-2 focus:ring-primary/20 transition-all outline-none" 
+        :class="cssField"
         :placeholder="placeholder" 
         :type="tipo"
         :name="nameValidation"
-        v-model="modelValue as string"
+        v-model="modelValue"
       />
-      <InputMask
+      <input
         unstyled  
         v-if="tipo == 'telefone'"
         class="w-full bg-surface-container-low border-none rounded-xl 
                px-4 py-3.5 text-on-surface placeholder:text-outline 
                focus:ring-2 focus:ring-primary/20 transition-all outline-none" 
-        placeholder="+55 (99) 99999-9999" 
-        mask="+55 (99) 99999-9999"
-        :name="nameValidation"
-        v-model="modelValue as string"
-      />
+        v-model="modelValue"
+        v-maska
+        data-maska="+55 (##) #####-####"
+        placeholder="+55 (99) 99999-9999"        
+        @maska="onMaska"
+      />      
       <span 
         class="material-symbols-outlined absolute right-4 top-1/2 -translate-y-1/2 
                text-outline group-focus-within:text-primary transition-colors"
@@ -76,6 +78,8 @@
 
 <script setup lang="ts">
 import { ref } from 'vue';
+import { vMaska } from 'maska/vue'
+import type { MaskaDetail } from 'maska'
 
 const mascara = ref({
   decimal: ',',
@@ -85,11 +89,14 @@ const mascara = ref({
   masked: true
 });
 
-const modelValue = defineModel('modelValue');
+const modelValue = defineModel<string>('modelValue');
+
+const unmaskedValue = ref<string>('');
 
 interface Props {
   label: string,
   estilos?: string,
+  cssField?: string,
   tipo: 'text' | 'password' | 'monetario' | 'telefone'
   icone: string,  
   placeholder?: string,  
@@ -103,8 +110,13 @@ interface Props {
 const props = withDefaults(defineProps<Props>(), {
   tipo: 'text',
   isInvalido: false,
-  msgDeErro: ''
+  msgDeErro: ''  
 });
+
+// Evento disparado pela biblioteca toda vez que o input muda
+const onMaska = (event: CustomEvent<MaskaDetail>) => {
+  unmaskedValue.value = event.detail.unmasked
+}
 </script>
 
 <style lang="css" scoped>

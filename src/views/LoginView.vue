@@ -30,7 +30,7 @@
               Login
             </label>
             <InputText 
-              class="w-full" 
+              class="w-full lowercase-input" 
               id="login" 
               type="text"
               name="login" 
@@ -93,16 +93,16 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue';
 import * as yup from 'yup';
-import { yupResolver } from '@primevue/forms/resolvers/yup';
-import SolicitacaoDeToken from '@/dto/SolicitacaoDeToken';
-import LoginClient from '@/client/LoginClient';
-import { usePerfilStore } from '@/composables/usePerfilStore';
+import { ref } from 'vue';
 import { useRouter } from 'vue-router';
+import { yupResolver } from '@primevue/forms/resolvers/yup';
+import { usePerfilStore } from '@/composables/usePerfilStore';
 import { useNavigationStore } from '@/composables/useNavigationStore';
+import SolicitacaoDeToken from '@/dto/SolicitacaoDeToken';
+import ResumoDaContaDeUsuario from '@/dto/ResumoDaContaDeUsuario';
+import LoginClient from '@/client/LoginClient';
 import ContaDeUsuarioClient from '@/client/ContaDeUsuarioClient';
-import type ResumoDaContaDeUsuario from '@/dto/ResumoDaContaDeUsuario';
 
 const navigation = useNavigationStore();
 

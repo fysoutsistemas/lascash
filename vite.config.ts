@@ -8,15 +8,17 @@ import { VitePWA } from 'vite-plugin-pwa';
 
 export default defineConfig({
   server: {
-    //allowedHosts: ['larcash', '.com.br'],
-    allowedHosts: ['.trycloudflare.com'],
+    allowedHosts: [
+      '.larcash.com.br', 
+      '.trycloudflare.com'
+    ],
     proxy: {
       //Configuração do proxy em: 
       // https://medium.com/@tanitoluwaadenuga/if-youve-ever-fought-a-cors-error-read-this-eb4326c3fc17
       "/api": {
-        //target: "https://liked-emma-ministries-potentially.trycloudflare.com ",
-        target: "http://192.168.100.55:9070",
-        //target: "https://larcash-api.onrender.com",
+        //target: "http://192.168.7.10:9070",        
+        //target: "http://192.168.100.55:9070",
+        target: "http://localhost:9070",
         changeOrigin: true,
         rewrite: (path) => path.replace(/^\/api/, ""),
       },
@@ -56,13 +58,17 @@ export default defineConfig({
         ]        
       },
       workbox: {
-        globPatterns: ["**/*.{**/*.{js,css,html,ico,png,svg,woff2}}"],
+        globPatterns: ["**/*.{js,css,html,ico,png,svg,woff2}"],
+        globIgnores: ["**/assets/material-symbols-*.woff2"],
         cleanupOutdatedCaches: true,
         clientsClaim: true,
         skipWaiting: true,
         runtimeCaching: [
           {
-            urlPattern: ({ url, request }) => request.method === 'GET' && url.pathname.startsWith('/api/'),
+            urlPattern: ({ url, request }) => {
+              return request.method === 'GET' && (url.pathname.startsWith('/api/') 
+                  || url.hostname.startsWith('api.larcash.com.br'));
+            },
             handler: "NetworkFirst",
             options: {
               cacheName: "api-cache",
@@ -75,7 +81,20 @@ export default defineConfig({
                 statuses: [0, 200]
               }
             }
-          }
+          },
+          {
+            // Fontes: baixadas uma vez, servidas do cache depois.
+            urlPattern: ({ request }) => request.destination === 'font',
+            handler: 'CacheFirst',
+            options: {
+              cacheName: 'font-cache',
+              expiration: {
+                maxEntries: 20,
+                maxAgeSeconds: 60 * 60 * 24 * 365, // 1 ano — fontes são versionadas
+              },
+              cacheableResponse: { statuses: [0, 200] },
+            },
+          },
         ]
       }
     }),

@@ -287,9 +287,10 @@
 import * as yup from 'yup';
 import { onMounted, ref } from 'vue';
 import { yupResolver } from '@primevue/forms/resolvers/yup';
-import { useRouter } from 'vue-router';
-import { useConfirm, useToast } from 'primevue';
 import { instanceToPlain, plainToInstance } from 'class-transformer';
+import { useRouter } from 'vue-router';
+import { useConfirm } from 'primevue';
+import { useSweetAlert2 } from '@/composables/useSweetAlert2';
 import ProdutoClient from '@/client/ProdutoClient';
 import ListaDeCompraClient from '@/client/ListaDeCompraClient';
 import ListaDeCompra from '@/dto/ListaDeCompra';
@@ -298,15 +299,14 @@ import CurrencyUtil from '@/util/CurrencyUtil';
 import ItemDaListaResumido from '@/dto/ItemDaListaResumido';
 import ListaDeCompraSalva from '@/dto/ListaDeCompraSalva';
 import NovaListaDeCompra from '@/dto/NovaListaDeCompra';
-import Swal from 'sweetalert2';
 
 const formRef = ref();
 
 const router = useRouter();
 
-const toast = useToast();
-
 const confirmacao = useConfirm();
+
+const alert = useSweetAlert2();
 
 const isEmEdicao = ref<boolean>(false);
 
@@ -423,12 +423,7 @@ const salvar = ({ valid }: any) => {
 
         isAlterado.value = false;
         
-        toast.add({
-          severity: 'success',
-          summary: 'Sucesso',
-          detail: 'Lista atualizada com sucesso',
-          life: 3000,
-        });
+        alert.showSuccess("Lista atualizada com sucesso");
 
       });
 
@@ -447,12 +442,7 @@ const salvar = ({ valid }: any) => {
 
         filtroPorNome.value = "";
 
-        toast.add({
-          severity: 'success',
-          summary: 'Sucesso',
-          detail: 'Lista criada com sucesso',
-          life: 3000,
-        });
+        alert.showSuccess("Lista criada com sucesso");
 
       });
 
@@ -469,17 +459,12 @@ const alternarSelecaoDeRecorrencia = () => {
   lista.value.flRecorrente = lista.value.flRecorrente == 'S' ? 'N' : 'S';
 
   if (lista.value.flRecorrente == 'S'){
-    Swal.fire({
-      icon: 'info',
-      title: 'Lista recorrente',
-      text: 'Listas recorrentes não são encerradas: elas permanecem ativas para reuso contínuo até que você desmarque esta opção.',
-      confirmButtonText: 'Entendi',
-      buttonsStyling: false,
-      customClass: { 
-        popup: 'larcash-popup', 
-        confirmButton: 'larcash-confirm' 
-      }
-    });
+    alert.showInfo(       
+      "Listas recorrentes não são encerradas: " + 
+          "elas permanecem ativas para reuso contínuo até que você desmarque esta opção.",      
+      "Lista recorrente",
+      "Entendi"
+    );
   }
 
 }

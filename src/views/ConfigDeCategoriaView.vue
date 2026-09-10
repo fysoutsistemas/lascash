@@ -81,10 +81,10 @@
 
 <script setup lang="ts">
 import { onMounted, ref } from 'vue';
-import { useToast } from 'primevue';
 import { unformat } from 'v-money3';
 import { useRouter } from 'vue-router';
 import { usePerfilStore } from '@/composables/usePerfilStore';
+import { useSweetAlert2 } from '@/composables/useSweetAlert2';
 import CategoriaClient from '@/client/CategoriaClient';
 import OrcamentoClient from '@/client/OrcamentoClient';
 import Categoria from '@/dto/Categoria';
@@ -96,7 +96,7 @@ const perfilStore = usePerfilStore();
 
 const router = useRouter();
 
-const toast = useToast();
+const alert = useSweetAlert2();
 
 const { atualizarCategsConfigs, isCategsConfiguradas } = perfilStore;
 
@@ -156,13 +156,8 @@ const salvar = () => {
       let isRedirecionar = !isCategsConfiguradas();
 
       atualizarCategsConfigs("S");
-      
-      toast.add({
-        severity: 'success',
-        summary: 'Sucesso',
-        detail: 'Limites atualizados com sucesso',
-        life: 3000,
-      });
+
+      alert.showSuccess('Limites atualizados com sucesso');
 
       if (isRedirecionar){
         router.push("/despesas");      

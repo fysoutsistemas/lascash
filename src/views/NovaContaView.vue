@@ -42,12 +42,13 @@
             nameValidation="login"
             label="LOGIN"
             estilos="mb-5"
+            cssField="lowercase-input"
             tipo="text"
             icone="person"
             placeholder="Ex: joao.silva"
             v-model:modelValue="conta.login"
             :isInvalido="$form.login?.invalid"
-            :msgDeErro="$form.login?.error?.message"
+            :msgDeErro="$form.login?.error?.message"            
           />
 
           <!-- Nome Completo -->
@@ -236,7 +237,7 @@ const registrar = ({ valid }: any ) => {
 
       conta.value.orcamentoMensal = String(unformat(conta.value.orcamentoMensal, mascara.value));
 
-      let novaConta = plainToInstance(NovaContaDeUsuario, conta.value);
+      let novaConta = plainToInstance(NovaContaDeUsuario, conta.value);      
 
       contaClient.registrar(novaConta).then(() => {
         router.push("/login");

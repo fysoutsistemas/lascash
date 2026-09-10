@@ -120,8 +120,52 @@
           v-if="!dashboard.resumosPorCateg.length" 
           class="text-[13px] text-slate-400 font-semibold text-center py-2"
         >
-          Nenhuma compra registrada nos últimos 30 dias.
+          Nenhuma compra registrada nos últimos {{ dashboard.periodoEmDias }} dias.
         </p>
+
+        <div 
+          v-if="dashboard.resumosPorCateg.length" 
+          class="relative flex items-center justify-center"
+        >
+          <svg width="160" height="160" viewBox="0 0 150 150" class="-rotate-90">
+            <circle 
+              cx="72" 
+              cy="72" 
+              r="60" 
+              fill="none" 
+              stroke="#f1f5f9" 
+              stroke-width="22" 
+            />
+            <circle 
+              v-for="res in dashboard.resumosPorCateg" :key="res.nome" 
+              cx="72" 
+              cy="72" 
+              r="60" 
+              fill="none" 
+              :stroke="res.cor" 
+              stroke-width="22" 
+              :stroke-dasharray="res.dasharray" 
+              :stroke-dashoffset="res.dashoffset" 
+            />
+          </svg>
+          <div class="absolute flex flex-col items-center gap-px">
+            <span class="text-[9.5px] font-extrabold text-slate-400 uppercase tracking-widest">
+              Total
+            </span>
+            <strong class="text-base font-extrabold text-slate-800 leading-none">
+              {{ CurrencyUtil.toBRL(dashboard.totalComprado) }}
+            </strong>
+            <span class="text-[10.5px] text-slate-400 font-semibold">
+              {{ 
+                dashboard.resumosPorCateg.length === 1 
+                ? '1 categoria' 
+                : dashboard.resumosPorCateg.length + ' categorias' 
+              }}
+            </span>
+          </div>
+        
+        </div>
+
         
         <div class="flex flex-col">
           <div 
@@ -186,6 +230,7 @@ import { useRouter } from 'vue-router';
 import ListaDeCompraClient from '@/client/ListaDeCompraClient';
 import DashboardDeCompras from '@/dto/DashboardDeCompras';
 import CurrencyUtil from '@/util/CurrencyUtil';
+import ResumoDeComprasDaCateg from '@/dto/ResumoDeComprasDaCateg';
 
 const router = useRouter();
 
@@ -194,11 +239,26 @@ const listaClient = new ListaDeCompraClient();
 const dashboard = ref<DashboardDeCompras>(new DashboardDeCompras());
 
 onMounted(() => {
-  listaClient.buscarDashboard().then((dash: DashboardDeCompras) => {
-    console.log(dash);
+  listaClient.buscarDashboard().then((dash: DashboardDeCompras) => {        
     dashboard.value = dash;
+    plotarGrafico();
   });  
 });  
+
+const plotarGrafico = () => {
+
+  const R = 52, CIRC = 2 * Math.PI * R;    
+
+  let acc = 0;    
+
+  dashboard.value.resumosPorCateg.forEach((res: ResumoDeComprasDaCateg) => {
+    const seg = (res.percentual / 100) * CIRC;
+    res.dasharray = seg.toFixed(2) + ' ' + (CIRC - seg).toFixed(2);//Calcula o tamanho do segmento
+    res.dashoffset = (-acc).toFixed(2);
+    acc += seg;      
+  });
+
+}
 
 const redirectToProdutos = () => {
   router.push("/produtos");

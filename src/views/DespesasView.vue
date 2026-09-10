@@ -6,6 +6,30 @@
       @aoMudarVisibilidade="atualizarVisibilidade"
     />
     <main class="flex-1 p-4 space-y-6 pb-20">
+
+      <section 
+        v-if="!isCategsConfiguradas()" 
+        class="bg-amber-50 border-[1.5px] border-amber-200 
+               rounded-[14px] px-4 py-3.5 flex gap-3 items-start"
+      >
+        <span 
+          class="w-[26px] h-[26px] rounded-full bg-amber-500 
+                 text-white flex items-center justify-center shrink-0"
+        >
+          <i class="pi pi-info" style="font-size: 1rem;"></i>
+        </span>  
+          <span class="flex-1 flex flex-col gap-1.5">
+            <strong class="text-[13.5px] font-extrabold text-amber-800">
+              Configure os limites
+            </strong>
+            <span class="text-[12.5px] leading-snug text-amber-700 font-semibold text-pretty text-justify">
+              As categorias ainda não possuem limites definidos. 
+              Sem limites, não dá para saber quando o gasto passou do combinado.
+            </span>
+          </span>
+        
+      </section>
+
       <section class="bg-white rounded-2xl shadow-sm border border-slate-100 p-5">
         <h2 class="text-lg font-semibold mb-4 flex items-center gap-2">
           <i class="pi pi-plus-circle text-emerald-500"></i> 
@@ -321,7 +345,7 @@ import * as yup from 'yup';
 import { onMounted, ref } from 'vue';
 import { yupResolver } from '@primevue/forms/resolvers/yup';
 import { plainToInstance } from 'class-transformer';
-import { useConfirm, useToast } from 'primevue';
+import { useConfirm } from 'primevue';
 import { usePerfilStore } from '@/composables/usePerfilStore';
 import { unformat } from 'v-money3';
 import LanctoClient from '@/client/LanctoClient';
@@ -331,14 +355,20 @@ import DateUtil from '@/util/DateUtil';
 import CurrencyUtil from '@/util/CurrencyUtil';
 import PainelFinanceiro from '@/dto/PainelFinanceiro';
 import CategoriaClient from '@/client/CategoriaClient';
+import { useSweetAlert2 } from '@/composables/useSweetAlert2';
 
 const confirmacao = useConfirm();
 
-const toast = useToast();
+const alert = useSweetAlert2();
 
 const perfilStore = usePerfilStore();
 
-const { getOcultarValores, getLogin } = perfilStore;
+const { 
+  getOcultarValores, 
+  getLogin, 
+  isCategsConfiguradas, 
+  isChefeDeFamilia 
+} = perfilStore;
 
 const mascara = ref({
   decimal: ',',
@@ -425,15 +455,10 @@ const lancar = ({ valid }: any) => {
         painel.value = painelResultante;
         
         limparCampos();
-    
+      
         ativarReset();
-  
-        toast.add({
-          severity: 'success',
-          summary: 'Sucesso',
-          detail: 'Lançamento criado com sucesso',
-          life: 3000,
-        });
+
+        alert.showSuccess("Lançamento criado com sucesso");  
   
       });  
 
@@ -466,12 +491,7 @@ const remover = (lanctoSelecionado: Lancamento) => {
 
             painel.value = painelEncontrado;
 
-            toast.add({
-              severity: 'success',
-              summary: 'Sucesso',
-              detail: 'Lançamento removido com sucesso',
-              life: 3000,
-            });
+            alert.showSuccess("Lançamento removido com sucesso");
 
           });
         

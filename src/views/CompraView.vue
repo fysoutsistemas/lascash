@@ -27,7 +27,7 @@
         </div>
         <span class="flex items-center gap-1.5 shrink-0">
           <span 
-            v-if="lista.flRecorrente == 'N'" 
+            v-if="lista.flRecorrente == 'S'" 
             title="Lista recorrente" class="flex items-center justify-center 
                    px-[7px] py-[5px] rounded-full bg-teal-100 text-teal-700"
           >              
@@ -260,13 +260,15 @@ import ListaDeCompra from '@/dto/ListaDeCompra';
 import CurrencyUtil from '@/util/CurrencyUtil';
 import Produto from '@/dto/Produto';
 import ItemDaLista from '@/dto/ItemDaLista';
-import Swal from 'sweetalert2';
 import ItemDoCarrinho from '@/dto/ItemDoCarrinho';
 import ListaDeCompraEncerrada from '@/dto/ListaDeCompraEncerrada';
+import { useSweetAlert2 } from '@/composables/useSweetAlert2';
 
 const router = useRouter();
 
 const confirmacao = useConfirm();
+
+const alert = useSweetAlert2();
 
 const listaClient = new ListaDeCompraClient();
 
@@ -362,6 +364,7 @@ const encerrarLista = (flagLancarDespesa: string) => {
   listaClient.encerrar(listaAtualizada)
     .then(() => {
       lista.value.status = "ENCERRADA"
+      alert.showSuccess("Lista encerrada com sucesso");
     });
 
 }
@@ -442,17 +445,11 @@ const atualizarFlag = (itemSel: ItemDaLista) => {
 const isPrecoInformadoDo = (itemSel: ItemDaLista): boolean => {
   
   if (toNumber(itemSel.preco) == 0){
-    Swal.fire({
-      icon: 'warning',
-      title: 'Informe o preço',
-      text: 'Defina o preço unitário antes de marcar o item como incluso no carrinho.',
-      confirmButtonText: 'Entendi',
-      buttonsStyling: false,
-      customClass: { 
-        popup: 'larcash-popup', 
-        confirmButton: 'larcash-confirm' 
-      }
-    });
+    alert.showInfo(       
+      "Defina o preço unitário antes de marcar o item como incluso no carrinho.",
+      "Informe o preço",
+      "Entendi"
+    );
   }
 
   return toNumber(itemSel.preco) > 0;

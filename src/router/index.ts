@@ -15,6 +15,7 @@ import ProdutosView from '@/views/ProdutosView.vue';
 import MontarListaView from '@/views/MontarListaView.vue';
 import ListasCriadasView from '@/views/ListasCriadasView.vue';
 import CompraView from '@/views/CompraView.vue';
+import IndicadoresGerais from '@/views/IndicadoresGerais.vue';
 
 const perfilStore = usePerfilStore();
 
@@ -141,6 +142,17 @@ const routes: RouteRecordRaw[] = [
   },
 
   {
+    path: '/indicadores/gerais',
+    component: IndicadoresGerais,
+    meta: {
+      titulo: 'Indicadores Gerais',
+      authentication: {
+        required: true
+      }
+    }
+  },
+
+  {
     path: '/login',
     component: LoginView,
     meta: {
@@ -149,7 +161,7 @@ const routes: RouteRecordRaw[] = [
         required: false
       }
     }
-  },
+  },  
 
   {
     path: '/nova-conta',
@@ -252,8 +264,6 @@ router.beforeEach(async (to, _from, next) => {
         if (!isCategsConfiguradas()){
           if (isChefeDeFamilia()){
             return next({ path: '/config-categs' });
-          }else{
-            return next({ path: '/' });
           }
         }
       } else if (path === '/config-categs') {

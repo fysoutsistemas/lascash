@@ -302,9 +302,10 @@ import * as yup from 'yup';
 import { onMounted, ref } from 'vue';
 import { yupResolver } from '@primevue/forms/resolvers/yup';
 import { useRouter } from 'vue-router';
-import { useConfirm, useToast } from 'primevue';
+import { useConfirm } from 'primevue';
 import { unformat } from 'v-money3';
 import { plainToInstance } from 'class-transformer';
+import { useSweetAlert2 } from '@/composables/useSweetAlert2';
 import CurrencyUtil from '@/util/CurrencyUtil';
 import CategoriaDoProdClient from '@/client/CategoriaDoProdClient';
 import ProdutoClient from '@/client/ProdutoClient';
@@ -316,7 +317,7 @@ const router = useRouter();
 
 const confirmacao = useConfirm();
 
-const toast = useToast();
+const alert = useSweetAlert2();
 
 const mascara = ref({
   decimal: ',',
@@ -406,12 +407,7 @@ const salvar = ({ valid }: any) => {
 
         filtroPorNome.value = "";
 
-        toast.add({
-          severity: 'success',
-          summary: 'Sucesso',
-          detail: 'Produto salvo com sucesso',
-          life: 3000,
-        });        
+        alert.showSuccess("Produto salvo com sucesso");
 
       });
 
@@ -445,15 +441,11 @@ const remover = (produtoSelecionado: Produto) => {
     accept: async () => {
 
       await produtoClient.inativarPor(produtoSelecionado.id);
-      
-      toast.add({
-        severity: 'success',
-        summary: 'Sucesso',
-        detail: 'Produto removido com sucesso',
-        life: 3000,
-      });
 
       listarProdutos();
+
+      alert.showSuccess("Produto removido com sucesso");      
+
     }
   });  
 
@@ -500,16 +492,8 @@ const onFilePicked = (e: any) => {
         }
 
       } else {
-
-        toast.add({
-          severity: 'error',
-          summary: 'Erro',
-          detail: "A foto do produto não deve ser maior que 500kb",
-          life: 3000,
-        });
-
+        alert.showError("A foto do produto não deve ser maior que 500kb");
       } 
-
 
     };
 

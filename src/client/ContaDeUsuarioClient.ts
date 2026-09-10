@@ -9,6 +9,7 @@ export default class ContaDeUsuarioClient {
   private URI: string = "/contas-usuarios";
 
   public async registrar(novaConta: NovaContaDeUsuario): Promise<void> {
+    novaConta.login = novaConta.login.toLowerCase();
     await clientHttp.post(`${this.URI}/registrar`, novaConta);
   }
 

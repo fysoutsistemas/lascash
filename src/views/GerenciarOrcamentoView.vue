@@ -113,10 +113,11 @@
 
 <script setup lang="ts">
 import { onMounted, ref } from 'vue';
-import { useConfirm, useToast } from 'primevue';
+import { useConfirm } from 'primevue';
 import { plainToInstance } from 'class-transformer';
 import { unformat } from 'v-money3';
 import { usePerfilStore } from '@/composables/usePerfilStore';
+import { useSweetAlert2 } from '@/composables/useSweetAlert2';
 import Orcamento from '@/dto/Orcamento';
 import ProgressoDoOrcamento from '@/dto/ProgressoDoOrcamento';
 import OrcamentoClient from '@/client/OrcamentoClient';
@@ -126,7 +127,7 @@ const perfilStore = usePerfilStore();
 
 const confirmacao = useConfirm();
 
-const toast = useToast();
+const alert = useSweetAlert2();
 
 const orcamentoClient = new OrcamentoClient();
 
@@ -169,15 +170,6 @@ const salvar = () => {
   }
 }
 
-const showMsgDeSucesso = (msg: string) => {
-  toast.add({
-    severity: 'success',
-    summary: 'Sucesso',
-    detail: msg,
-    life: 4000,
-  });
-}
-
 const inserir = () => {
 
   orcamento.value.limite = String(unformat(orcamento.value.limite, mascara.value));
@@ -191,8 +183,8 @@ const inserir = () => {
     orcamentoClient.buscarProgresso()
       .then((progressoEncontrado: ProgressoDoOrcamento) => {
         progresso.value = progressoEncontrado;
-        orcamento.value = new Orcamento();        
-        showMsgDeSucesso("Novo orçamento criado!");
+        orcamento.value = new Orcamento();                
+        alert.showSuccess("Novo orçamento criado!");
       });
     
   });
@@ -209,7 +201,7 @@ const atualizar = () => {
       .then((progressoEncontrado: ProgressoDoOrcamento) => {        
         progresso.value = progressoEncontrado;
         orcamento.value = orcamentoAtualizado;
-        showMsgDeSucesso("Orçamento atualizado!");
+        alert.showSuccess("Orçamento atualizado!");
       });
 
   });
