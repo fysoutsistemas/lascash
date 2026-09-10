@@ -592,7 +592,7 @@ const gastosOrcPorCategs = ref<GastoOrcPorCateg[]>([]);
 
 const maiorGasto = ref<GastoOrcPorCateg>(new GastoOrcPorCateg());
 
-const economiaEmCompras = ref<EconomiaEmCompras>(new EconomiaEmCompras());
+const economiaEmCompras = ref<EconomiaEmCompras | null>(new EconomiaEmCompras());
 
 const resumoGeralDeCompras = ref<ResumoGeralDeCompras>(new ResumoGeralDeCompras());
 
@@ -669,8 +669,10 @@ const getDescDeDuracaoDeGastos = (): string => {
 
     if (mediaDeGastoDia == 0){
       return "Assim que houver gastos, mostramos a previsão aqui."
-    }else{
+    }else if (terminoProjetado !== null){
       return "No ritmo de hoje, o saldo dura até " + DateUtil.formatarData(terminoProjetado) + ".";
+    }else{
+      return "";
     }
 
   }

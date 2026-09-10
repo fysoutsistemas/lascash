@@ -366,8 +366,7 @@ const perfilStore = usePerfilStore();
 const { 
   getOcultarValores, 
   getLogin, 
-  isCategsConfiguradas, 
-  isChefeDeFamilia 
+  isCategsConfiguradas
 } = perfilStore;
 
 const mascara = ref({

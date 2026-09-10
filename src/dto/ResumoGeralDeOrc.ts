@@ -53,7 +53,7 @@ export default class ResumoGeralDeOrc {
 
   @Expose({ name: 'dataDeTermino' })
   @Type(() => Date)
-  public get dataDeTermino(): Date {
+  public get dataDeTermino(): Date | null{
     return this._dataDeTermino;
   }
   
@@ -63,7 +63,7 @@ export default class ResumoGeralDeOrc {
 
   @Expose({ name: 'dataDeTerminoProjetada' })
   @Type(() => Date)
-  public get dataDeTerminoProjetada(): Date {
+  public get dataDeTerminoProjetada(): Date | null {
     return this._dataDeTerminoProjetada;
   }
   

@@ -60,7 +60,7 @@ export default class IndicadoresGerais {
 
   @Expose({ name: 'economiaEmCompras' })
   @Type(() => EconomiaEmCompras)
-  public get economiaEmCompras(): EconomiaEmCompras {
+  public get economiaEmCompras(): EconomiaEmCompras | null{
     return this._economiaEmCompras;
   }
       
