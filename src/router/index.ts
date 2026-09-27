@@ -16,6 +16,8 @@ import MontarListaView from '@/views/MontarListaView.vue';
 import ListasCriadasView from '@/views/ListasCriadasView.vue';
 import CompraView from '@/views/CompraView.vue';
 import IndicadoresGerais from '@/views/IndicadoresGerais.vue';
+import NotificacaoDeListaView from '@/views/NotificacaoDeListaView.vue';
+import AtivacaoDeContaView from '@/views/AtivacaoDeContaView.vue';
 
 const perfilStore = usePerfilStore();
 
@@ -82,7 +84,7 @@ const routes: RouteRecordRaw[] = [
         required: true
       }
     }
-  },
+  },  
 
   {
     path: '/lista-compra/listagem',
@@ -113,6 +115,20 @@ const routes: RouteRecordRaw[] = [
     props: true,
     meta: {
       titulo: 'Orçamento',
+      authentication: {
+        required: true
+      }
+    }
+  },  
+
+  {
+    path: '/notificacao/lista/:idDaLista',
+    component: NotificacaoDeListaView,
+    props: route => ({ 
+      idDaLista: Number(route.params.idDaLista) 
+    }) ,
+    meta: {
+      titulo: 'Notificação',
       authentication: {
         required: true
       }
@@ -175,6 +191,19 @@ const routes: RouteRecordRaw[] = [
   },  
 
   {
+    path: '/ativacao-conta/:modo',
+    name: 'ativacao-conta',
+    component: AtivacaoDeContaView,    
+    props: true,
+    meta: {
+      titulo: 'Ativação de Conta',
+      authentication: {
+        required: false
+      }
+    }
+  },
+
+  {
     path: '/novo-membro/:token',
     component: NovoMembroView,
     props: true,
@@ -216,7 +245,12 @@ const router = createRouter({
   routes
 });
 
-const ROTAS_PUBLICAS: string[] = ['/login', '/nova-conta'];
+const ROTAS_PUBLICAS: string[] = [
+  '/login', 
+  '/nova-conta', 
+  '/novo-membro', 
+  '/ativacao-conta'
+];
 
 const isRotaEncontradaPara = (to: RouteLocationNormalized) => {
   return to.matched.length > 0 && to.matched[0].name !== 'catch-all';
@@ -243,8 +277,9 @@ router.beforeEach(async (to, _from, next) => {
     const path = to.path.toLowerCase();
 
     if (isRotaPublica(to)) {      
-      
+
       if (path === '/nova-conta'){
+
         if (isTokenValido()){
           return next({ path: '/' });    
         }

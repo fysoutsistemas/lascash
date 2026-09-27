@@ -348,6 +348,7 @@ import { plainToInstance } from 'class-transformer';
 import { useConfirm } from 'primevue';
 import { usePerfilStore } from '@/composables/usePerfilStore';
 import { unformat } from 'v-money3';
+import { useSweetAlert2 } from '@/composables/useSweetAlert2';
 import LanctoClient from '@/client/LanctoClient';
 import Lancamento from '@/dto/Lancamento';
 import Categoria from '@/dto/Categoria';
@@ -355,7 +356,6 @@ import DateUtil from '@/util/DateUtil';
 import CurrencyUtil from '@/util/CurrencyUtil';
 import PainelFinanceiro from '@/dto/PainelFinanceiro';
 import CategoriaClient from '@/client/CategoriaClient';
-import { useSweetAlert2 } from '@/composables/useSweetAlert2';
 
 const confirmacao = useConfirm();
 

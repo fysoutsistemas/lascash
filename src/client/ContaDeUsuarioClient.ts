@@ -1,8 +1,8 @@
+import { plainToInstance } from "class-transformer";
 import clientHttp from "@/composables/useAxios";
 import ContaDeUsuarioEditada from "@/dto/ContaDeUsuarioEditada";
 import NovaContaDeUsuario from "@/dto/NovaContaDeUsuario";
 import ResumoDaContaDeUsuario from "@/dto/ResumoDaContaDeUsuario";
-import { plainToInstance } from "class-transformer";
 
 export default class ContaDeUsuarioClient {
 

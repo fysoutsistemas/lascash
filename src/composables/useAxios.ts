@@ -9,7 +9,10 @@ export const isLoading = ref(false);
 
 const perfilStore = usePerfilStore();
 
-const { isTokenValido, getToken } = perfilStore;
+const { 
+  isTokenValido, 
+  getToken 
+} = perfilStore;
 
 const alert = useSweetAlert2();
 
@@ -46,7 +49,8 @@ clientHttp.interceptors.request.use(
       config.data = instanceToPlain(config.data);
     }    
 
-    if  (config.url !== "/auth" && config.url !== "/contas-usuarios/registrar"){
+    if  (config.url !== "/auth" && config.url !== "/contas-usuarios/registrar" 
+          && config.url !== "/validacoes-otp/nova-conta" ){
 
       if (isTokenValido()){
         config.headers['Authorization'] = `Bearer ${getToken()}`;
@@ -92,7 +96,7 @@ clientHttp.interceptors.response.use(
                   : error.message;
 
         alert.showError(msg);
-  
+
       }
 
     }else{

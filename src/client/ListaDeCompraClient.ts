@@ -90,4 +90,8 @@ export default class ListaDeCompraClient {
     await clientHttp.delete(`${this.URI}/${idDaLista}/produto/${idDoProduto}/carrinho`);  
   }
 
+  public async notificar(idDaLista: number, loginNotificado: string): Promise<void> {
+    await clientHttp.post(`${this.URI}/${idDaLista}/usuario/${loginNotificado}/notificar`);  
+  }
+
 }

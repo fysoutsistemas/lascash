@@ -6,6 +6,7 @@ export default class NovaContaDeUsuario {
     public senha: string = "",
     public confirmacao: string = "",
     public nomeCompleto: string = "",
-    public telefone: string = ""
+    public telefone: string = "",
+    public codigoOTP: string = ""
   ){}
 }

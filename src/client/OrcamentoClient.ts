@@ -1,7 +1,7 @@
+import { plainToInstance } from "class-transformer";
 import clientHttp from "@/composables/useAxios";
 import Orcamento from "@/dto/Orcamento";
 import ProgressoDoOrcamento from "@/dto/ProgressoDoOrcamento";
-import { plainToInstance } from "class-transformer";
 
 export default class OrcamentoClient {
   

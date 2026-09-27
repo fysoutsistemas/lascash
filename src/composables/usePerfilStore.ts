@@ -16,6 +16,10 @@ export const usePerfilStore = () => {
     localStorage.removeItem("token");
     localStorage.removeItem("nomeCompleto");
     localStorage.removeItem("nomeDaFamilia");
+    localStorage.removeItem("flCategsConfigs");
+    localStorage.removeItem("flChefeDaFamilia");
+    localStorage.removeItem("fotoDoUsuario");
+    localStorage.removeItem("qtdeDeMembros");
   }
 
   const isTokenValido = (): boolean => {
@@ -52,12 +56,17 @@ export const usePerfilStore = () => {
     return localStorage.getItem("fotoDoUsuario") ?? "";
   }
 
+  const getQtdeDeMembros = (): number => {
+    return Number(localStorage.getItem("qtdeDeMembros") ?? 1);
+  }
+
   const atualizar = (resumoDaConta: ResumoDaContaDeUsuario) => {
     localStorage.setItem("nomeCompleto", resumoDaConta.nomeCompleto);
     localStorage.setItem("nomeDaFamilia", resumoDaConta.nomeDaFamilia);
     localStorage.setItem("flCategsConfigs", resumoDaConta.flCategoriasConfiguradas);
     localStorage.setItem("flChefeDaFamilia", resumoDaConta.flChefeDaFamilia);
     localStorage.setItem("fotoDoUsuario", resumoDaConta.foto);
+    localStorage.setItem("qtdeDeMembros", String(resumoDaConta.qtdeDeMembros));
   }
 
   const atualizarOcultarValores = (isOcultar: boolean) => {  
@@ -94,7 +103,8 @@ export const usePerfilStore = () => {
     getOcultarValores,
     atualizarCategsConfigs,
     isCategsConfiguradas,
-    isChefeDeFamilia
+    isChefeDeFamilia,
+    getQtdeDeMembros
   }
 
 };

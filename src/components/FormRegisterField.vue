@@ -40,7 +40,7 @@
         :name="nameValidation"
         v-model="modelValue"
       />
-      <input
+      <InputText
         unstyled  
         v-if="tipo == 'telefone'"
         class="w-full bg-surface-container-low border-none rounded-xl 
@@ -48,6 +48,7 @@
                focus:ring-2 focus:ring-primary/20 transition-all outline-none" 
         v-model="modelValue"
         v-maska
+        :name="nameValidation"
         data-maska="+55 (##) #####-####"
         placeholder="+55 (99) 99999-9999"        
         @maska="onMaska"

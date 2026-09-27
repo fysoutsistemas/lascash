@@ -15,7 +15,7 @@
         <div class="w-10"></div>
       </div>
     </header>
-    <main class="flex-1 space-y-6 pb-10 bg-surface">
+    <main class="flex-1 space-y-6 pb-10 bg-surface">    
       <!-- Titulo Principal -->
       <div class="mb-10 mt-10 text-center">
         <h1 class="text-4xl font-extrabold text-on-surface tracking-tight mb-2">
@@ -24,17 +24,18 @@
         <p class="text-on-surface-variant font-medium text-sm">
           Comece a cuidar do futuro da sua família hoje.
         </p>
-      </div>
+      </div>      
       <!-- Card de Formulario -->
       <div 
         class="bg-white rounded-4xl shadow-[0_20px_40px_rgba(25,28,30,0.06)] 
                border border-slate-100 p-7 m-6"
       >
         <Form 
+          ref="formRef"
           v-slot="$form"
           :initialValues="conta" 
           :resolver="validatorResolver"
-          @submit="registrar"
+          @submit="redirectToAtivacao"
         >
           <!-- Login -->
           <FormRegisterField
@@ -101,11 +102,11 @@
             tipo="monetario"
             icone="payments"            
             v-model:modelValue="conta.orcamentoMensal"
-            :isInvalido="isValidarCampos && isOrcamentoInvalido"
+            :isInvalido="isOrcamentoInvalido"
             :msgDeErro="'O orçamento mensal deve ser positivo'"
             :aoValidarValor="validarOrcamento"
           />
-          
+
           <!-- Senha -->
           <FormRegisterField
             id="senha"
@@ -158,19 +159,36 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue';
 import * as yup from 'yup';
+import { onMounted, ref } from 'vue';
 import { yupResolver } from '@primevue/forms/resolvers/yup';
 import { unformat } from 'v-money3';
 import { plainToInstance } from 'class-transformer';
 import { useRouter } from 'vue-router';
+import { useAtivacaoStore } from '@/composables/useAtivacaoStore';
+import { useSweetAlert2 } from '@/composables/useSweetAlert2';
+import { useCronometroDeEspera } from '@/composables/useCronometroDeEspera';
 import FormRegisterField from '@/components/FormRegisterField.vue';
 import NovaContaDeUsuario from '@/dto/NovaContaDeUsuario';
-import ContaDeUsuarioClient from '@/client/ContaDeUsuarioClient';
+import ValidacaoOTPClient from '@/client/ValidacaoOTPClient';
 
-const contaClient = new ContaDeUsuarioClient();
+const formRef = ref();
 
 const router = useRouter();
+
+const alert = useSweetAlert2();
+
+const validacaoClient = new ValidacaoOTPClient();
+
+const {
+  isEmEspera,
+  iniciarCronometro
+} = useCronometroDeEspera();
+
+const { 
+  getNovaContaDeUsuario,
+  salvarConta 
+} = useAtivacaoStore();
 
 const mascara = ref({
   decimal: ',',
@@ -210,9 +228,19 @@ const validatorResolver = ref(yupResolver(
     telefone: yup
       .string()
       .required("O telefone é obrigatório.")
+      .length(19, "Informe o telefone completo.")
       .matches(/^\+55 \(\d{2}\) 9\d{4}-\d{4}$/, "Formato de telefone inválido.")
   })
 ));
+
+onMounted(() => {
+  
+  if (getNovaContaDeUsuario() != null){
+    conta.value = getNovaContaDeUsuario() as NovaContaDeUsuario;
+    formRef.value.setValues({ ...conta.value });
+  }
+
+});
 
 const ativarReset = () => {
   formKey.value++;
@@ -220,11 +248,11 @@ const ativarReset = () => {
 }
 
 const validarOrcamento = () => {
-  isOrcamentoInvalido.value = conta.value.orcamentoMensal === "0,00";  
+  isOrcamentoInvalido.value = isValidarCampos.value && conta.value.orcamentoMensal === "0,00";
 }
 
-const registrar = ({ valid }: any ) => {
-
+const redirectToAtivacao = ({ valid }: any ) => {
+  
   isValidarCampos.value = true;
 
   validarOrcamento();
@@ -239,14 +267,43 @@ const registrar = ({ valid }: any ) => {
 
       let novaConta = plainToInstance(NovaContaDeUsuario, conta.value);      
 
-      contaClient.registrar(novaConta).then(() => {
-        router.push("/login");
-      });
+      salvarConta(novaConta);
+
+      if (isEmEspera.value){
+        redirectToAtivacaoDaConta();
+      }else{
+
+        validacaoClient.gerarCodigoOTP(novaConta.login, novaConta.telefone)        
+          .then(() => {
+  
+            alert.showConfirmWithHTML(
+              "Conta criada!",
+              `Enviamos um código de <strong>6 dígitos</strong> 
+              pelo WhatsApp para <strong>${novaConta.telefone}</strong>.`,
+              "Inserir código",
+              () => {
+                iniciarCronometro();
+                redirectToAtivacaoDaConta();
+              }
+            );
+  
+          });
+
+      }
 
     }
 
-  }  
+  }
 
+}
+
+const redirectToAtivacaoDaConta = () => {
+  router.push({
+    name: 'ativacao-conta',
+    params: {
+      modo: 'chefe-familia'
+    }
+  });
 }
 
 const redirectToLogin = () => {

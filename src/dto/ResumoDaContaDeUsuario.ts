@@ -5,6 +5,7 @@ export default class ResumoDaContaDeUsuario {
     public nomeDaFamilia: string = "",
     public flCategoriasConfiguradas: string = "N",
     public flChefeDaFamilia: string = "N",
-    public foto: string
+    public foto: string,
+    public qtdeDeMembros: number = 0
   ){}
 }

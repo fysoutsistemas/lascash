@@ -122,7 +122,7 @@
                    bg-red-50 rounded-[9px] px-3 py-2 active:scale-95 transition"
             @click="remover(lista as ListaDeCompra)"       
           >            
-            <i class="pi pi-trash"></i> Excluir
+            <i class="pi pi-trash"></i>
           </button>
           <button 
             v-if="lista.status == 'NOVA'"
@@ -130,14 +130,22 @@
                    bg-amber-100 rounded-[9px] px-3 py-2 active:scale-95 transition"
             @click="redirectToEdicao(lista as ListaDeCompra)"       
           >            
-            <i class="pi pi-pencil"></i> Editar
+            <i class="pi pi-pencil"></i>
+          </button>
+          <button 
+            v-if="lista.status === 'NOVA' && perfilStore.getQtdeDeMembros() > 1"
+            class="flex items-center gap-1.5 text-[12.5px] font-bold text-emerald-700 
+                   bg-emerald-400 rounded-[9px] px-3.5 py-2 active:scale-95 transition"
+            @click="redirectToNotificacao(lista as ListaDeCompra)"       
+          >
+            <i class="pi pi-whatsapp" style="color: white;"></i>
           </button>
           <button 
             class="flex items-center gap-1.5 text-[12.5px] font-bold text-emerald-700 
                    bg-emerald-100 rounded-[9px] px-3.5 py-2 active:scale-95 transition"
             @click="abrir(lista as ListaDeCompra)"       
           >
-            Abrir <i class="pi pi-chevron-right"></i>
+            <i class="pi pi-chevron-right"></i>
           </button>
         </div>
       </div>
@@ -160,6 +168,7 @@
 import { onMounted, ref } from 'vue';
 import { useRouter } from 'vue-router';
 import { useConfirm } from 'primevue';
+import { usePerfilStore } from '@/composables/usePerfilStore';
 import { useSweetAlert2 } from '@/composables/useSweetAlert2';
 import type { IPagina } from '@/util/PaginacaoUtil';
 import ListaDeCompraClient from '@/client/ListaDeCompraClient';
@@ -168,6 +177,8 @@ import CurrencyUtil from '@/util/CurrencyUtil';
 import ResumoDaLista from '@/dto/ResumoDaLista';
 
 const router = useRouter();
+
+const perfilStore = usePerfilStore();
 
 const confirmacao = useConfirm();
 
@@ -296,6 +307,10 @@ const abrir = (listaSel: ListaDeCompra) => {
 const redirectToEdicao = (listaSel: ListaDeCompra) => {
   localStorage.setItem("ultimaTela", "/lista-compra/listagem");
   router.push(`/lista-compra/montagem/${listaSel.id}`)
+}
+
+const redirectToNotificacao = (listaSel: ListaDeCompra) => {
+  router.push(`/notificacao/lista/${listaSel.id}`);
 }
 
 const redirectToPainel = () => {

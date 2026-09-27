@@ -99,6 +99,7 @@ import { useRouter } from 'vue-router';
 import { yupResolver } from '@primevue/forms/resolvers/yup';
 import { usePerfilStore } from '@/composables/usePerfilStore';
 import { useNavigationStore } from '@/composables/useNavigationStore';
+import { useAtivacaoStore } from '@/composables/useAtivacaoStore';
 import SolicitacaoDeToken from '@/dto/SolicitacaoDeToken';
 import ResumoDaContaDeUsuario from '@/dto/ResumoDaContaDeUsuario';
 import LoginClient from '@/client/LoginClient';
@@ -111,6 +112,8 @@ const perfilStore = usePerfilStore();
 const { registrarToken, atualizar } = perfilStore;
 
 const { resetarNavegacao } = navigation;
+
+const { removerConta } = useAtivacaoStore();
 
 const router = useRouter();
 
@@ -137,6 +140,9 @@ const logar = async ({ valid }: any ) => {
     
     loginClient.autenticar(usuario.value).then(
       (tokenGerado: string) => {        
+
+        removerConta();
+
         registrarToken(tokenGerado);
 
         contaCliente.buscarResumo().then((resumo: ResumoDaContaDeUsuario) => {

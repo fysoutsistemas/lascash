@@ -29,6 +29,8 @@ export const useSweetAlert2 = () => {
       title: titulo,
       text: msg,
       confirmButtonText: textConfirm,
+      allowOutsideClick: false,
+      allowEscapeKey: false,
       buttonsStyling: false,
       customClass: { 
         popup: 'larcash-popup', 
@@ -37,7 +39,61 @@ export const useSweetAlert2 = () => {
     });
   }
 
+  const showConfirmWithHTML = (
+    titulo: string,
+    html: string,
+    textConfirm: string = "Sim",
+    funcao: Function  
+  ) => {
+    Swal.fire({
+      icon: 'success',
+      title: titulo,
+      html: html,      
+      confirmButtonText: textConfirm,            
+      buttonsStyling: false,
+      allowOutsideClick: false,
+      allowEscapeKey: false,
+      customClass: {
+        popup: 'larcash-popup',
+        confirmButton: 'larcash-confirm',       
+      }
+    }).then(r => { 
+      funcao();
+    });
+  }
+
+  const showQuestionWithHTML = (
+    titulo: string,
+    html: string,
+    textConfirm: string = "Sim",
+    funcao: Function
+  ) => {
+    Swal.fire({
+      icon: 'question',
+      title: titulo,
+      html: html,
+      showCancelButton: true,
+      confirmButtonText: textConfirm,
+      cancelButtonText: 'Cancelar',
+      reverseButtons: true,
+      buttonsStyling: false,
+      allowOutsideClick: false,
+      allowEscapeKey: false,
+      customClass: { 
+        popup: 'larcash-popup', 
+        confirmButton: 'larcash-confirm', 
+        cancelButton: 'larcash-cancel' 
+      }
+    }).then(r => { 
+      if (r.isConfirmed){
+        funcao();
+      }
+    });
+  }
+
   return {
+    showConfirmWithHTML,
+    showQuestionWithHTML,
     showSuccess,
     showError,
     showWarn,
