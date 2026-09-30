@@ -317,8 +317,10 @@ const showLinkDialog = () => {
 }
 
 const copyLink = async () => {
-
+  
   await navigator.clipboard.writeText(linkDoNovoMembro.value);
+
+  isShowLink.value = false;
 
   alert.showSuccess("Link copiado com sucesso");
 

@@ -32,9 +32,9 @@
         <div class="bg-surface-container-low rounded-xl p-4 inline-block text-left">
           <p class="text-sm text-on-surface-variant leading-relaxed">
             Você foi convidado por 
-            <span class="font-bold text-primary">{{ nomeDoChefe }}</span> 
+            <span class="font-bold text-primary">{{ getNomeDoChefe() }}</span> 
             para integrar a 
-            <span class="font-bold text-primary">Família {{ nomeDaFamlia }}</span> 
+            <span class="font-bold text-primary">Família {{ getNomeDaFamilia() }}</span> 
             no LarCa$h.
           </p>
         </div>
@@ -44,11 +44,11 @@
         class="bg-white rounded-4xl shadow-[0_20px_40px_rgba(25,28,30,0.06)] 
                border border-slate-100 p-7 m-6"
       >
-        <Form 
+        <Form
           v-slot="$form"
           :initialValues="membro" 
           :resolver="validatorResolver"
-          @submit="registrar"
+          @submit="redirectToAtivacao"
         >
           <!-- Login -->
           <FormRegisterField
@@ -56,6 +56,7 @@
             nameValidation="login"
             label="LOGIN"
             estilos="mb-5"
+            cssField="lowercase-input"
             tipo="text"
             icone="person"
             placeholder="Ex: joao.silva"
@@ -203,20 +204,34 @@ import { onMounted, ref } from 'vue';
 import { plainToInstance } from 'class-transformer';
 import { useRouter } from 'vue-router';
 import { useConviteValidator } from '@/composables/useConviteValidator';
-import ConviteClient from '@/client/ConviteClient';
+import { useCronometroDeEspera } from '@/composables/useCronometroDeEspera';
+import { useAtivacaoStore } from '@/composables/useAtivacaoStore';
+import { useSweetAlert2 } from '@/composables/useSweetAlert2';
 import NovoMembro from '@/dto/NovoMembro';
-
-const conviteClient = new ConviteClient();
+import ValidacaoOTPClient from '@/client/ValidacaoOTPClient';
 
 const router = useRouter();
 
-const conviteValidator = useConviteValidator();
+const alert = useSweetAlert2();
 
-const { nomeDoChefe,
-        nomeDaFamlia,
-        registrarConvite,
-        isConviteValido 
-      } = conviteValidator;
+const validacaoClient = new ValidacaoOTPClient();
+
+const {
+  isEmEspera,
+  iniciarCronometro
+} = useCronometroDeEspera();
+
+const { 
+  getNovoMembro,
+  salvarMembro 
+} = useAtivacaoStore();
+
+const { 
+  getNomeDoChefe,
+  getNomeDaFamilia,
+  registrarConvite,
+  isConviteValido 
+} = useConviteValidator();
 
 const formKey = ref(0);
 
@@ -244,34 +259,61 @@ const validatorResolver = ref(yupResolver(
     telefone: yup
       .string()
       .required("O telefone é obrigatório.")
+      .length(19, "Informe o telefone completo.")
       .matches(/^\+55 \(\d{2}\) 9\d{4}-\d{4}$/, "Formato de telefone inválido.")    
   })
 ));
 
 onMounted(() => {
+
   registrarConvite(props.token ? props.token : '');
+
   isTokenValido.value = isConviteValido();
-});  
+
+  if (getNovoMembro() != null){
+    membro.value = getNovoMembro() as NovoMembro;
+  }
+
+});
 
 const props = defineProps({
   token: String
 });
 
-const registrar = ({ valid }: any ) => {
+const redirectToAtivacao = ({ valid }: any ) => {
 
   isValidarCampos.value = true;
 
   ativarReset();
   
   if (valid){
-    
+
     let novoMembro = plainToInstance(NovoMembro,  membro.value);
     novoMembro.tokenDoConvite = props.token ? props.token : '';
 
-    conviteClient.registrar(novoMembro)
-      .then(() => {
-        router.push("/login");
-      });
+    salvarMembro(novoMembro);
+
+    if (isEmEspera.value){
+      redirectToAtivacaoDaConta();
+    }else{
+
+      validacaoClient.gerarCodigoOTP(novoMembro.login, novoMembro.telefone)        
+        .then(() => {
+
+          alert.showConfirmWithHTML(
+            "Conta criada!",
+            `Enviamos um código de <strong>6 dígitos</strong> 
+            pelo WhatsApp para <strong>${novoMembro.telefone}</strong>.`,
+            "Inserir código",
+            () => {
+              iniciarCronometro();
+              redirectToAtivacaoDaConta();
+            }
+          );
+
+        }); 
+
+    }
 
   }  
 
@@ -280,6 +322,15 @@ const registrar = ({ valid }: any ) => {
 const ativarReset = () => {
   formKey.value++;
   isValidarCampos.value = false;
+}
+
+const redirectToAtivacaoDaConta = () => {
+  router.push({
+    name: 'ativacao-conta',
+    params: {
+      modo: 'membro-familia'
+    }
+  });
 }
 
 const redirectToLogin = () => {

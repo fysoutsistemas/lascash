@@ -50,7 +50,8 @@ clientHttp.interceptors.request.use(
     }    
 
     if  (config.url !== "/auth" && config.url !== "/contas-usuarios/registrar" 
-          && config.url !== "/validacoes-otp/nova-conta" ){
+          && config.url !== "/validacoes-otp/nova-conta" 
+          && config.url !== "/convites/registrar"){
 
       if (isTokenValido()){
         config.headers['Authorization'] = `Bearer ${getToken()}`;

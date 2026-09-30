@@ -5,6 +5,7 @@ export default class NovoMembro {
     public confirmacao: string = "",
     public nomeCompleto: string = "",
     public tokenDoConvite: string = "",
-    public telefone: string = ""
+    public telefone: string = "",
+    public codigoOTP: string = ""
   ){}
 }

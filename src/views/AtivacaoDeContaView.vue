@@ -3,7 +3,7 @@
     <header class="w-full top-0 sticky z-50 bg-white">
       <div class="flex items-center justify-between px-6 py-4 max-w-7xl mx-auto">
         <button 
-          @click="redirectToNovaConta()"
+          @click="redirectToTelaAnterior()"
           class="text-emerald-900 hover:bg-emerald-50 transition-colors p-2 
                  rounded-full active:opacity-80 scale-95 transition-all"
         >
@@ -184,12 +184,17 @@ import { useSweetAlert2 } from '@/composables/useSweetAlert2';
 import ContaDeUsuarioClient from '@/client/ContaDeUsuarioClient';
 import NovaContaDeUsuario from '@/dto/NovaContaDeUsuario';
 import ValidacaoOTPClient from '@/client/ValidacaoOTPClient';
+import NovoMembro from '@/dto/NovoMembro';
+import ConviteClient from '@/client/ConviteClient';
+import { useConviteValidator } from '@/composables/useConviteValidator';
 
 const router = useRouter();
 
 const alert = useSweetAlert2();
 
 const contaClient = new ContaDeUsuarioClient();
+
+const conviteClient = new ConviteClient();
 
 const validacaoClient = new ValidacaoOTPClient();
 
@@ -199,12 +204,20 @@ const {
   iniciarCronometro
 } = useCronometroDeEspera();
 
-const { 
+const {
+  getNovoMembro, 
   getNovaContaDeUsuario, 
+  removerMembro,
   removerConta 
 } = useAtivacaoStore();
 
+const {
+  getNomeDaFamilia
+} = useConviteValidator();
+
 const conta = ref<NovaContaDeUsuario>();
+
+const membro = ref<NovoMembro>();
 
 const isInvalido = ref<boolean>(false);
 
@@ -218,7 +231,17 @@ const codigo5 = ref<string>("");
 const codigo6 = ref<string>("");
 
 onMounted(() => {
-  conta.value = getNovaContaDeUsuario() as NovaContaDeUsuario;
+
+  if (props.modo){
+
+    if (props.modo === "chefe-familia"){
+      conta.value = getNovaContaDeUsuario() as NovaContaDeUsuario;
+    }else if (props.modo === "membro-familia"){
+      membro.value = getNovoMembro() as NovoMembro;
+    }
+
+  }
+
 });
 
 const props = defineProps({
@@ -232,34 +255,69 @@ const ativarConta = () => {
     let codigoOTP = codigo1.value + codigo2.value + codigo3.value 
         + codigo4.value + codigo5.value + codigo6.value;        
 
-    if (conta.value){      
+    if (props.modo === "chefe-familia"){
 
-      conta.value.codigoOTP = codigoOTP;
+      if (conta.value){      
+  
+        conta.value.codigoOTP = codigoOTP;
+  
+        let novaConta = plainToInstance(NovaContaDeUsuario, conta.value);
+  
+        contaClient.registrar(novaConta)
+          .then(() => {
+  
+            alert.showConfirmWithHTML(
+              "Conta ativada!",
+              `A conta da família <strong>${novaConta.nomeDaFamilia.trim()}
+              </strong> está ativa. Faça login para começar.`,
+              "Ir para o login",
+              () => { 
+                removerConta();
+                redirectToLogin(); 
+              }
+            );
+            
+          })
+          .catch((_)=>{          
+            isInvalido.value = true;
+            msgDeErro.value = "Código inválido. Confira a mensagem no WhatsApp."
+            limparCampos();
+          });
+  
+      }
 
-      let novaConta = plainToInstance(NovaContaDeUsuario, conta.value);
+    }else if (props.modo === "membro-familia"){
 
-      contaClient.registrar(novaConta)
-        .then(() => {
+      if (membro.value){
+        
+        membro.value.codigoOTP = codigoOTP;
 
-          alert.showConfirmWithHTML(
-            "Conta ativada!",
-            `A conta da família <strong>${novaConta.nomeDaFamilia.trim()}
-            </strong> está ativa. Faça login para começar.`,
-            "Ir para o login",
-            () => { 
-              removerConta();
-              redirectToLogin(); 
-            }
-          );
-          
-        })
-        .catch((_)=>{          
-          isInvalido.value = true;
-          msgDeErro.value = "Código inválido. Confira a mensagem no WhatsApp."
-          limparCampos();
-        });
+        let novoMembro = plainToInstance(NovoMembro,  membro.value);
 
-    }    
+        conviteClient.registrar(novoMembro)
+          .then(() => {
+
+            alert.showConfirmWithHTML(
+              "Conta ativada!",
+              `A família <strong>${getNomeDaFamilia().trim()}
+              </strong> te aceitou com sucesso. Faça login para começar.`,
+              "Ir para o login",
+              () => { 
+                removerMembro();
+                redirectToLogin(); 
+              }
+            );
+            
+          })
+          .catch((_)=>{          
+            isInvalido.value = true;
+            msgDeErro.value = "Código inválido. Confira a mensagem no WhatsApp."
+            limparCampos();
+          });
+
+      }
+
+    }
 
   }else{
     isInvalido.value = true;
@@ -296,6 +354,13 @@ const reenviarCodigo = () => {
         iniciarCronometro();
       }); 
 
+  }else if (membro.value){
+
+    validacaoClient.gerarCodigoOTP(membro.value.login, membro.value.telefone)
+      .then(() => {
+        iniciarCronometro();
+      }); 
+
   }
 
 }
@@ -306,8 +371,25 @@ const isCodigoInformado = () => {
       && codigo5.value.trim() !== "" && codigo6.value.trim() !== "";
 }
 
+const redirectToTelaAnterior = () => {
+  if (props.modo === "chefe-familia"){
+    redirectToNovaConta();
+  }else if (props.modo === "membro-familia"){
+    redirectToNovoMembro();
+  }
+}
+
 const redirectToNovaConta = () => {
   router.push("/nova-conta");
+}
+
+const redirectToNovoMembro = () => {
+  router.push({
+    name: 'novo-membro',
+    params: {
+      token: membro.value?.tokenDoConvite
+    }
+  });
 }
 
 const redirectToLogin = () => {

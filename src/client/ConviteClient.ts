@@ -11,6 +11,7 @@ export default class ConviteClient {
   }
 
   public async registrar(novoMembro: NovoMembro): Promise<void> {
+    novoMembro.login = novoMembro.login.toLowerCase();
     await clientHttp.post(`${this.URI}/registrar`, novoMembro);
   }
 

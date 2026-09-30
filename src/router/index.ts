@@ -205,6 +205,7 @@ const routes: RouteRecordRaw[] = [
 
   {
     path: '/novo-membro/:token',
+    name: 'novo-membro',
     component: NovoMembroView,
     props: true,
     meta: {
@@ -276,7 +277,7 @@ router.beforeEach(async (to, _from, next) => {
 
     const path = to.path.toLowerCase();
 
-    if (isRotaPublica(to)) {      
+    if (isRotaPublica(to)) {
 
       if (path === '/nova-conta'){
 
