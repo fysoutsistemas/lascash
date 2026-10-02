@@ -29,7 +29,7 @@
             class="m-0 text-[1.625rem] font-extrabold text-[#111827] 
                    tracking-[-0.02em] text-center"
           >
-            Ative sua conta
+            {{ tituloPrincipal }}
           </h1>
           <p 
             class="m-0 text-sm text-[#64748b] font-medium 
@@ -38,7 +38,7 @@
             Enviamos um código de 6 dígitos pelo WhatsApp para
           </p>
           <strong class="text-[0.96875rem] font-extrabold text-[#0e9d6b]">
-            {{ conta?.telefone }}
+            {{ telefone }}
           </strong>
         </div>
       </div>
@@ -129,7 +129,7 @@
           >
           </i>
           <span class="ml-2">
-            Ativar conta  
+            {{ labelDoBotao }}  
           </span>
         </Button>
 
@@ -181,12 +181,14 @@ import { useAtivacaoStore } from '@/composables/useAtivacaoStore';
 import { useCronometroDeEspera } from '@/composables/useCronometroDeEspera';
 import { plainToInstance } from 'class-transformer';
 import { useSweetAlert2 } from '@/composables/useSweetAlert2';
+import { useConviteValidator } from '@/composables/useConviteValidator';
 import ContaDeUsuarioClient from '@/client/ContaDeUsuarioClient';
 import NovaContaDeUsuario from '@/dto/NovaContaDeUsuario';
 import ValidacaoOTPClient from '@/client/ValidacaoOTPClient';
 import NovoMembro from '@/dto/NovoMembro';
 import ConviteClient from '@/client/ConviteClient';
-import { useConviteValidator } from '@/composables/useConviteValidator';
+import ResetDeSenhaClient from '@/client/ResetDeSenhaClient';
+import type ResetDeSenha from '@/dto/ResetDeSenha';
 
 const router = useRouter();
 
@@ -195,6 +197,8 @@ const alert = useSweetAlert2();
 const contaClient = new ContaDeUsuarioClient();
 
 const conviteClient = new ConviteClient();
+
+const resetClient = new ResetDeSenhaClient();
 
 const validacaoClient = new ValidacaoOTPClient();
 
@@ -207,6 +211,9 @@ const {
 const {
   getNovoMembro, 
   getNovaContaDeUsuario, 
+  getTelefone,
+  getLogin,
+  salvarCodigoOTP,
   removerMembro,
   removerConta 
 } = useAtivacaoStore();
@@ -230,14 +237,26 @@ const codigo4 = ref<string>("");
 const codigo5 = ref<string>("");
 const codigo6 = ref<string>("");
 
+const tituloPrincipal = ref<string>("Ative sua conta");
+
+const telefone = ref<string>("");
+
+const labelDoBotao = ref<string>("Ativar conta");
+
 onMounted(() => {
 
-  if (props.modo){
+  if (props.modo){    
 
     if (props.modo === "chefe-familia"){
       conta.value = getNovaContaDeUsuario() as NovaContaDeUsuario;
+      telefone.value = conta.value.telefone;
     }else if (props.modo === "membro-familia"){
       membro.value = getNovoMembro() as NovoMembro;
+      telefone.value = membro.value.telefone;
+    }else if (props.modo === "reset-senha"){
+      tituloPrincipal.value = "Verifique sua conta";
+      labelDoBotao.value = "Verificar código"
+      telefone.value = getTelefone();
     }
 
   }
@@ -309,7 +328,7 @@ const ativarConta = () => {
             );
             
           })
-          .catch((_)=>{          
+          .catch((_)=>{
             isInvalido.value = true;
             msgDeErro.value = "Código inválido. Confira a mensagem no WhatsApp."
             limparCampos();
@@ -317,6 +336,19 @@ const ativarConta = () => {
 
       }
 
+    }else if (props.modo === "reset-senha") {
+
+      resetClient.validarCodigoPor(getLogin(), codigoOTP)
+        .then((_:ResetDeSenha) => {
+          salvarCodigoOTP(codigoOTP);
+          redirectToNovaSenha();
+        })
+        .catch((_)=>{
+            isInvalido.value = true;
+            msgDeErro.value = "Código inválido. Confira a mensagem no WhatsApp."
+            limparCampos();
+        });
+      
     }
 
   }else{
@@ -376,7 +408,13 @@ const redirectToTelaAnterior = () => {
     redirectToNovaConta();
   }else if (props.modo === "membro-familia"){
     redirectToNovoMembro();
+  }else if (props.modo === "reset-senha"){
+    redirectToReset();
   }
+}
+
+const redirectToReset = () => {
+  router.push("/reset-login");
 }
 
 const redirectToNovaConta = () => {
@@ -394,6 +432,10 @@ const redirectToNovoMembro = () => {
 
 const redirectToLogin = () => {
   router.push("/login");
+}
+
+const redirectToNovaSenha = () => {
+  router.push("/nova-senha");
 }
 </script>
 

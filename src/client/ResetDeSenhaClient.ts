@@ -7,8 +7,9 @@ export default class ResetDeSenhaClient {
 
   private URI: string = "/reset-senha";
 
-  public async gerarCodigoOTP(login: string): Promise<void> {
-    await clientHttp.post(`${this.URI}/${login}`);
+  public async gerarCodigoOTP(login: string): Promise<string> {
+    const response = await clientHttp.post(`${this.URI}/${login}`);
+    return response.data.telefone;
   }
 
   public async validarCodigoPor(login: string, codigo: string): Promise<ResetDeSenha> {

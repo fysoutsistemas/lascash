@@ -73,6 +73,16 @@
             label="Entrar"             
             class="w-full border-none shadow-md hover:opacity-90 transition-all bg-vibrant-green"
           />
+          <Button 
+            unstyled
+            type="button" 
+            @click="redirectToResetDeSenha()" 
+            class="w-full text-[13.5px] font-bold 
+                   text-emerald-600 active:scale-95 
+                   transition"
+          >
+            Esqueci minha senha
+          </Button>
         </Form>        
       </main>
       <footer class="pb-12 px-8 text-center">
@@ -113,7 +123,11 @@ const { registrarToken, atualizar } = perfilStore;
 
 const { resetarNavegacao } = navigation;
 
-const { removerConta } = useAtivacaoStore();
+const { 
+  removerConta,
+  removerMembro,
+  removerReset,
+} = useAtivacaoStore();
 
 const router = useRouter();
 
@@ -143,6 +157,10 @@ const logar = async ({ valid }: any ) => {
 
         removerConta();
 
+        removerMembro();
+
+        removerReset();
+
         registrarToken(tokenGerado);
 
         contaCliente.buscarResumo().then((resumo: ResumoDaContaDeUsuario) => {
@@ -156,6 +174,10 @@ const logar = async ({ valid }: any ) => {
     
   }
 
+}
+
+const redirectToResetDeSenha = () => {
+  router.push("/reset-login");
 }
 
 const redirectToNovaConta = () => {

@@ -18,6 +18,8 @@ import CompraView from '@/views/CompraView.vue';
 import IndicadoresGerais from '@/views/IndicadoresGerais.vue';
 import NotificacaoDeListaView from '@/views/NotificacaoDeListaView.vue';
 import AtivacaoDeContaView from '@/views/AtivacaoDeContaView.vue';
+import LoginResetadoView from '@/views/LoginResetadoView.vue';
+import NovaSenhaView from '@/views/NovaSenhaView.vue';
 
 const perfilStore = usePerfilStore();
 
@@ -215,6 +217,28 @@ const routes: RouteRecordRaw[] = [
       }
     }
   },
+
+  {
+    path: '/reset-login',
+    component: LoginResetadoView,    
+    meta: {
+      titulo: 'Login Resetado',
+      authentication: {
+        required: false
+      }
+    }
+  },
+
+  {
+    path: '/nova-senha',
+    component: NovaSenhaView,    
+    meta: {
+      titulo: 'Nova Senha',
+      authentication: {
+        required: false
+      }
+    }
+  },
   
   {
     path: '/404',
@@ -250,7 +274,9 @@ const ROTAS_PUBLICAS: string[] = [
   '/login', 
   '/nova-conta', 
   '/novo-membro', 
-  '/ativacao-conta'
+  '/ativacao-conta',
+  '/reset-login',
+  '/nova-senha'
 ];
 
 const isRotaEncontradaPara = (to: RouteLocationNormalized) => {

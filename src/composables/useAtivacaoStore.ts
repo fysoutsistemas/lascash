@@ -2,7 +2,16 @@ import { instanceToPlain, plainToInstance } from "class-transformer";
 import NovaContaDeUsuario from "@/dto/NovaContaDeUsuario";
 import NovoMembro from "@/dto/NovoMembro";
 
-export const useAtivacaoStore = () => {  
+export const useAtivacaoStore = () => {
+  
+  const salvarCodigoOTP = (codigo: string) => {
+    localStorage.setItem("codigoOTP", codigo);
+  }
+
+  const salvarInfosDoReset = (login: string, telefone: string) => {
+    localStorage.setItem("telefone", telefone);
+    localStorage.setItem("login", login);
+  }
   
   const salvarMembro = (novoMembro: NovoMembro) => {
     localStorage.setItem("novoMembro", JSON.stringify(instanceToPlain(novoMembro)));
@@ -18,6 +27,12 @@ export const useAtivacaoStore = () => {
 
   const removerConta = () => {        
     localStorage.removeItem("novaContaDeUsuario");  
+  }
+
+  const removerReset = () => {
+    localStorage.removeItem("codigoOTP");
+    localStorage.removeItem("telefone");
+    localStorage.removeItem("login");
   }
 
   const getNovoMembro = (): NovoMembro | null => {
@@ -42,13 +57,31 @@ export const useAtivacaoStore = () => {
 
   }
 
+  const getTelefone = (): string => {
+    return localStorage.getItem("telefone") ?? "";
+  }
+
+  const getLogin = (): string => {
+    return localStorage.getItem("login") ?? "";
+  }
+
+  const getCodigoOTP = (): string => {
+    return localStorage.getItem("codigoOTP") ?? "";
+  }
+
   return {
+    getCodigoOTP,
+    getTelefone,
+    getLogin,
     getNovoMembro,
     removerMembro,
     salvarMembro,
     getNovaContaDeUsuario,
     removerConta,
-    salvarConta
+    salvarConta,
+    salvarInfosDoReset,
+    salvarCodigoOTP,
+    removerReset
   }
 
 };
