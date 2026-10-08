@@ -20,6 +20,11 @@ export const usePerfilStore = () => {
     localStorage.removeItem("flChefeDaFamilia");
     localStorage.removeItem("fotoDoUsuario");
     localStorage.removeItem("qtdeDeMembros");
+    localStorage.removeItem("tipoDeConta");
+    localStorage.removeItem("telefoneDeAtendimento");
+    localStorage.removeItem("flExpirada");
+    localStorage.removeItem("diasRestantes");
+    localStorage.removeItem("percRestante");
   }
 
   const isTokenValido = (): boolean => {
@@ -61,12 +66,26 @@ export const usePerfilStore = () => {
   }
 
   const atualizar = (resumoDaConta: ResumoDaContaDeUsuario) => {
+    
     localStorage.setItem("nomeCompleto", resumoDaConta.nomeCompleto);
     localStorage.setItem("nomeDaFamilia", resumoDaConta.nomeDaFamilia);
     localStorage.setItem("flCategsConfigs", resumoDaConta.flCategoriasConfiguradas);
     localStorage.setItem("flChefeDaFamilia", resumoDaConta.flChefeDaFamilia);
     localStorage.setItem("fotoDoUsuario", resumoDaConta.foto);
     localStorage.setItem("qtdeDeMembros", String(resumoDaConta.qtdeDeMembros));
+    
+    if (resumoDaConta.resumoDaAssinatura){
+
+      let resDaAss = resumoDaConta.resumoDaAssinatura;
+      
+      localStorage.setItem("tipoDeConta", resDaAss.tipo);
+      localStorage.setItem("telefoneDeAtendimento", resDaAss.telefoneDeAtendimento);
+      localStorage.setItem("flExpirada", resDaAss.flExpirada);
+      localStorage.setItem("diasRestantes", String(resDaAss.diasRestantes));
+      localStorage.setItem("percRestante", String(resDaAss.percRestante));
+
+    }
+
   }
 
   const atualizarOcultarValores = (isOcultar: boolean) => {  
@@ -81,15 +100,40 @@ export const usePerfilStore = () => {
     localStorage.setItem("flCategsConfigs", flag);
   }
 
-  const isCategsConfiguradas = () : boolean => {
+  const isCategsConfiguradas = (): boolean => {
     return localStorage.getItem("flCategsConfigs") == 'S';
   }
 
-  const isChefeDeFamilia = () : boolean => {
+  const isChefeDeFamilia = (): boolean => {
     return localStorage.getItem("flChefeDaFamilia") == 'S';
   }
 
+  const getTipoDeConta = (): string => {
+    return localStorage.getItem("tipoDeConta") ?? "Não Informado";
+  }
+
+  const getTelefoneDeAtendimento = (): string => {
+    return localStorage.getItem("telefoneDeAtendimento") ?? "Não Informado";
+  }
+
+  const isAssinaturaExpirada = () : boolean => {
+    return localStorage.getItem("flExpirada") == 'S';
+  }
+
+  const getDiasRestantes = (): number => {
+    return Number(localStorage.getItem("diasRestantes") ?? 0);
+  }
+
+  const getPercRestante = () => {
+    return Number(localStorage.getItem("percRestante") ?? 0);
+  }
+
   return {
+    getTipoDeConta,
+    getTelefoneDeAtendimento,
+    isAssinaturaExpirada,
+    getDiasRestantes,
+    getPercRestante,
     registrarToken,
     atualizar,
     logout,

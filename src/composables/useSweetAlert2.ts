@@ -58,7 +58,9 @@ export const useSweetAlert2 = () => {
         confirmButton: 'larcash-confirm',       
       }
     }).then(r => { 
-      funcao();
+      if (r.isConfirmed){
+        funcao();
+      }
     });
   }
 

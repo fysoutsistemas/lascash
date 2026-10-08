@@ -163,7 +163,7 @@ const logar = async ({ valid }: any ) => {
 
         registrarToken(tokenGerado);
 
-        contaCliente.buscarResumo().then((resumo: ResumoDaContaDeUsuario) => {
+        contaCliente.buscarResumo().then((resumo: ResumoDaContaDeUsuario) => {          
           atualizar(resumo);
           resetarNavegacao();
           router.push("/");

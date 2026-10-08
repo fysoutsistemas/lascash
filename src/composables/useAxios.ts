@@ -55,7 +55,6 @@ clientHttp.interceptors.request.use(
           && config.url !== "/nova-senha"
           && config.url !== "/reset-senha"
           && !config.url?.includes("/reset-login/")){
-      console.log("AQUI");
       if (isTokenValido()){
         config.headers['Authorization'] = `Bearer ${getToken()}`;
         config.headers['ngrok-skip-browser-warning'] = 'true';

@@ -108,6 +108,106 @@
         </Button>
       </section>
 
+      <section 
+        v-if="getTipoDeConta() === 'TRIAL' || getTipoDeConta() === 'MENSALISTA'"
+        class="rounded-2xl border-[0.09375rem] px-4 py-3.5 flex flex-col gap-3" 
+        :class="{
+          'bg-red-50': getDiasRestantes() <= 3,
+          'border-red-200': getDiasRestantes() <= 3,
+          'bg-amber-50': getDiasRestantes() <= 7,
+          'border-amber-200': getDiasRestantes() <= 7,
+          'bg-emerald-50': getDiasRestantes() > 7,
+          'border-emerald-200': getDiasRestantes() > 7
+        }"
+      >
+        <div class="flex items-center gap-3">
+          <span 
+            class="w-11 h-11 shrink-0 rounded-xl flex items-center justify-center" 
+            :class="{
+              'bg-red-100': getDiasRestantes() <= 3,
+              'text-red-600': getDiasRestantes() <= 3,
+              'bg-amber-100': getDiasRestantes() <= 7,
+              'text-amber-600': getDiasRestantes() <= 7,
+              'bg-emerald-100': getDiasRestantes() > 7,
+              'text-emerald-600': getDiasRestantes() > 7
+            }"
+          >        
+            <i 
+              v-if="getTipoDeConta() === 'TRIAL'" 
+              class="pi pi-hourglass" 
+              style="font-size: 1rem"
+            >
+            </i>
+            <i 
+              v-if="getTipoDeConta() === 'MENSALISTA'" 
+              class="pi pi-shield" 
+              style="font-size: 1rem"
+            >
+            </i>
+          </span>
+          <div class="flex-1 min-w-0 flex flex-col gap-0.5">
+            <span 
+              class="text-[0.6875rem] font-extrabold uppercase tracking-wider" 
+              :class="{
+                'text-red-600': getDiasRestantes() <= 3,
+                'text-amber-600': getDiasRestantes() <= 7,
+                'text-emerald-600': getDiasRestantes() > 7
+              }"
+            >
+              {{ 
+                getTipoDeConta() === 'TRIAL' 
+                ? 'Período de teste' 
+                : 'Licença ativa'                
+              }}
+            </span>
+            <strong 
+              class="text-[0.9375rem] font-extrabold leading-snug 
+                     text-slate-800 text-pretty"
+            >
+              {{ getMensagemDaAssinatura() }}
+            </strong>
+          </div>
+          <span 
+            class="shrink-0 flex flex-col items-center leading-none" 
+            :class="{
+              'text-red-600': getDiasRestantes() <= 3,
+              'text-amber-600': getDiasRestantes() <= 7,
+              'text-emerald-600': getDiasRestantes() > 7
+            }"
+          >
+            <strong class="text-[1.75rem] font-extrabold">
+              {{ getDiasRestantes() }}
+            </strong>
+            <span class="text-[0.6875rem] font-extrabold uppercase">
+              {{ getDiasRestantes() === 1 ? 'dia' : 'dias' }}
+            </span>
+          </span>
+        </div>
+        <div class="h-1.5 rounded-full bg-white/80 overflow-hidden">
+          <div 
+            class="h-full rounded-full transition-all" 
+            :class="{
+              'bg-red-500': getDiasRestantes() <= 3,
+              'bg-amber-500': getDiasRestantes() <= 7,
+              'bg-emerald-500': getDiasRestantes() > 7
+            }" 
+            :style="{ width: getPercRestante() + '%' }"
+          >
+          </div>
+        </div>
+        <a 
+          :href="'https://wa.me/' + getTelefoneDeAtendimento() + '?text=' + encodeURIComponent(getMsgDoWhats())" 
+          target="_blank" 
+          rel="noopener"
+          class="flex items-center justify-center gap-2 rounded-xl bg-green-500 py-3 
+                 text-sm font-extrabold text-white no-underline shadow-[0_6px_14px_rgba(34,197,94,0.25)] 
+                 active:scale-[0.98] transition"
+        >
+          <i class="pi pi-whatsapp" style="font-size: 1rem"></i>
+          Falar com o suporte no WhatsApp
+        </a>
+      </section>
+
       <section v-if="isChefeDeFamilia()">
         <div class="bg-[#10b981]/10 border-l-4 border-[#10b981] rounded-xl p-5 space-y-3">
           <div class="flex items-center gap-2 text-on-primary-container">
@@ -284,7 +384,16 @@ const perfilStore = usePerfilStore();
 //Dispara o registro do service worker do PWA
 usePwaUpdate();
 
-const { getOcultarValores, isChefeDeFamilia } = perfilStore;
+const { 
+  getLogin,
+  getTipoDeConta,  
+  getTelefoneDeAtendimento,
+  isAssinaturaExpirada,
+  getDiasRestantes,
+  getPercRestante,
+  getOcultarValores, 
+  isChefeDeFamilia 
+} = perfilStore;
 
 const progresso = ref<ProgressoDoOrcamento>(new ProgressoDoOrcamento());
 
@@ -304,6 +413,43 @@ onMounted(() => {
     });    
 
 });
+
+const getMensagemDaAssinatura = () => {
+
+  if (getTipoDeConta() == "TRIAL"){
+    
+    if (getDiasRestantes() == 1){
+      return "Seu teste gratuito termina hoje. Assine para não perder o acesso.";
+    }else{
+      
+      let msg = "Seu teste gratuito termina ";
+      
+      if (getDiasRestantes() == 2){
+        msg += "amanhã";
+      }else{
+        msg += "em " + getDiasRestantes() + " dias";
+      }
+      
+      msg += ". Aproveite todos os recursos!";
+
+      return msg;
+    }
+
+  }else{
+
+    if (getDiasRestantes() == 1){
+      return 'Sua assinatura vence hoje. Renove para continuar usando.';
+    }else{
+      return 'Sua assinatura está ativa e vence em ' + getDiasRestantes() + ' dias.'
+    }  
+
+  }
+
+}
+
+const getMsgDoWhats = () => {
+  return `Olá, suporte LarCa$h! Sou o usuário ${getLogin()}, tenho uma licença ativa (${getDiasRestantes()} dia(s) restante(s)) e preciso de ajuda.`
+}
 
 const atualizarVisibilidade = (isOcultarValores: boolean) => {
   isOcultar.value = isOcultarValores;
